@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   Compass,
   LayoutDashboard,
-  Leaf,
   LogOut,
   MessageCircle,
   ShieldCheck,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import type { EmployeeTwin } from "@/types/sakha";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
+import { SakhaLogo } from "@/components/SakhaLogo";
 
 export type View = "chat" | "career" | "manager";
 
@@ -67,16 +67,11 @@ export function Sidebar({
 
   return (
     <aside className="surface flex h-full flex-col gap-6 p-5" style={{ background: "var(--sidebar)" }}>
-      <Link href="/" className="flex items-center gap-3">
-        <div className="brand-gradient flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-lg">
-          <Leaf className="h-6 w-6" />
-        </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">
-            HCLTech · OpenAI
-          </p>
-          <h1 className="text-xl font-semibold tracking-tight brand-text">Sakha AI</h1>
-        </div>
+      <Link href="/" className="flex flex-col items-start gap-1.5">
+        <SakhaLogo className="h-12 w-auto" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">
+          HCLTech · OpenAI
+        </p>
       </Link>
 
       <div>
@@ -157,11 +152,8 @@ export function MobileBar({
   return (
     <div className="surface flex flex-col gap-2.5 p-2.5" style={{ background: "var(--sidebar)" }}>
       <div className="flex items-center gap-2.5">
-        <Link
-          href="/"
-          className="brand-gradient flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white"
-        >
-          <Leaf className="h-5 w-5" />
+        <Link href="/" className="flex shrink-0 items-center">
+          <SakhaLogo className="h-8 w-auto" />
         </Link>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{identity.name}</p>

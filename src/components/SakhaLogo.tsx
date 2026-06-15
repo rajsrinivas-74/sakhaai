@@ -12,6 +12,7 @@ export function SakhaLogo({ className }: { className?: string }) {
       width={280}
       height={230}
       priority
+      unoptimized
       className={className}
     />
   );

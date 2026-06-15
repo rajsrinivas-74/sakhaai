@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Sakha AI — Employee Success Operating System",
   description:
     "Sakha AI is an Employee Digital Twin-powered companion for onboarding, career growth, HR support, and manager insight.",
+  icons: { icon: "/sakhaai.svg" },
 };
 
 export default function RootLayout({
