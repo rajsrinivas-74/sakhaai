@@ -11,7 +11,6 @@ import { AskSakhaView } from "@/components/AskSakhaView";
 import { DigitalTwin } from "@/components/DigitalTwin";
 import { AgentDock } from "@/components/AgentDock";
 import { LiveRail } from "@/components/LiveRail";
-import { ProactiveNotification } from "@/components/ProactiveNotification";
 import { personaById } from "@/data/personas";
 import { proactiveNotifications } from "@/data/notifications";
 import type { CareerGpsResult, PersonaId, ProactiveNotification as Notif } from "@/types/sakha";
@@ -128,7 +127,14 @@ export function SakhaApp({
               <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[1fr_340px]">
                 <div className="min-h-0 max-lg:min-h-[72vh]">
                   {view === "career" ? (
-                    <CareerGps twin={twin} prefillGoal={careerPrefill} onResult={handleGpsResult} />
+                    <CareerGps
+                      twin={twin}
+                      prefillGoal={careerPrefill}
+                      onResult={handleGpsResult}
+                      notif={notif}
+                      onNotifAction={handleNotifAction}
+                      onNotifDismiss={() => setNotif(null)}
+                    />
                   ) : (
                     <SakhaChat twin={twin} onNavigateCareer={navigateCareer} />
                   )}
@@ -151,14 +157,6 @@ export function SakhaApp({
       <div className="xl:hidden">
         <AgentDock />
       </div>
-
-      {isEmployee && (
-        <ProactiveNotification
-          notif={notif}
-          onAction={handleNotifAction}
-          onDismiss={() => setNotif(null)}
-        />
-      )}
 
       {/* Mobile-only Digital Twin slide-over */}
       <AnimatePresence>

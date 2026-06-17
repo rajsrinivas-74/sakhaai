@@ -30,7 +30,7 @@ export function ProactiveNotification({
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, x: 28 }}
           transition={{ type: "spring", stiffness: 280, damping: 26 }}
-          className="surface fixed inset-x-3 bottom-3 z-50 p-4 shadow-2xl sm:inset-x-auto sm:bottom-auto sm:right-5 sm:top-5 sm:w-[min(92vw,360px)]"
+          className="surface p-4 shadow-xl"
           style={{ borderColor: accentRgba(accent, 0.5) }}
         >
           <div className="flex items-start gap-3">
