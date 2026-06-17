@@ -13,14 +13,17 @@ export default async function AppPage({
   const personaParam = typeof sp.persona === "string" ? sp.persona : undefined;
   const viewParam = typeof sp.view === "string" ? sp.view : undefined;
 
-  // "vikram" / view=manager authenticate as the manager lens; otherwise an
-  // employee. Unknown params default to Priya — the golden demo path.
+  // "vikram"/view=manager → manager lens, "anita"/view=hr → HR lens; otherwise
+  // an employee. Unknown params default to Priya — the golden demo path.
   const isManager = viewParam === "manager" || personaParam === "vikram";
+  const isHr = viewParam === "hr" || personaParam === "anita";
   const actor: Actor = isManager
     ? "vikram"
-    : EMPLOYEES.includes(personaParam as PersonaId)
-      ? (personaParam as PersonaId)
-      : "priya";
+    : isHr
+      ? "anita"
+      : EMPLOYEES.includes(personaParam as PersonaId)
+        ? (personaParam as PersonaId)
+        : "priya";
 
   const initialView: View | undefined = viewParam === "career" ? "career" : undefined;
 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { CareerGpsResult, EmployeeTwin } from "@/types/sakha";
 import { ACCENT_HEX, accentRgba } from "@/lib/accents";
+import { DreyfusBadge } from "@/components/DreyfusBadge";
 
 const TREND_ACCENT = {
   stable: "cyan",
@@ -74,13 +75,15 @@ export function DigitalTwin({
         >
           {twin.name.slice(0, 1)}
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-lg font-semibold text-[var(--text-primary)]">{twin.fullName}</p>
           <p className="text-xs text-[var(--text-secondary)]">
             {twin.role} · {twin.location}
           </p>
         </div>
       </div>
+
+      {twin.dreyfus && <DreyfusBadge level={twin.dreyfus} />}
 
       <div className="mt-5 space-y-3 text-sm">
         <TwinRow icon={BriefcaseBusiness} label="Stage" value={twin.stage} accent="blue" />

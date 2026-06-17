@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Leaf, Send, Ticket } from "lucide-react";
+import { ArrowUpRight, Leaf, Send, Target, Ticket } from "lucide-react";
 import type { ChatCard, ChatMessage, EmployeeTwin } from "@/types/sakha";
 import type { ScriptedResponse } from "@/data/scripted";
 import { ACCENT_HEX, accentRgba } from "@/lib/accents";
@@ -18,7 +18,10 @@ function greeting(twin: EmployeeTwin): ChatMessage {
       role: "sakha",
       text: "Good morning, Priya. Project Helix access is ready and your Azure cert is on record. I noticed your AI Engineer goal from the last check-in — want me to map your path?",
       time: "09:02",
-      quickReplies: ["How do I become an AI Engineer?", "How many leaves do I have?"],
+      quickReplies: [
+        "I've been in the same role for 4 years. I want to move into AI. What should I do next?",
+        "What role should I target next?",
+      ],
     },
     arjun: {
       id: nextId(),
@@ -98,6 +101,15 @@ export function SakhaChat({
         return;
       }
 
+      // "Considering resigning" — propagate a retention signal to manager + HR.
+      if (resp.action === "flag_retention") {
+        void fetch("/api/retention-flag", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ persona: twin.id }),
+        }).catch(() => {});
+      }
+
       setMessages((prev) => [
         ...prev,
         {
@@ -144,7 +156,7 @@ export function SakhaChat({
 
       <div ref={scrollRef} className="thin-scroll flex-1 space-y-4 overflow-y-auto p-6">
         {messages.map((m) => (
-          <Bubble key={m.id} message={m} onQuickReply={send} />
+          <Bubble key={m.id} message={m} onQuickReply={send} onSelectRole={onNavigateCareer} />
         ))}
         {typing && <Typing />}
       </div>
@@ -175,9 +187,11 @@ export function SakhaChat({
 function Bubble({
   message,
   onQuickReply,
+  onSelectRole,
 }: {
   message: ChatMessage;
   onQuickReply: (text: string) => void;
+  onSelectRole: (goal: string) => void;
 }) {
   const isSakha = message.role === "sakha";
   return (
@@ -198,7 +212,7 @@ function Bubble({
           {message.text}
         </div>
 
-        {message.card && <CardView card={message.card} />}
+        {message.card && <CardView card={message.card} onSelectRole={onSelectRole} />}
 
         {message.quickReplies && (
           <div className="mt-2 flex flex-wrap gap-2">
@@ -221,7 +235,47 @@ function Bubble({
   );
 }
 
-function CardView({ card }: { card: ChatCard }) {
+function CardView({ card, onSelectRole }: { card: ChatCard; onSelectRole: (goal: string) => void }) {
+  if (card.type === "matches") {
+    return (
+      <div className="mt-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+            <Target className="h-4 w-4 text-[var(--ai-purple)]" />
+            {card.title}
+          </div>
+          <AutonomyBadge level="auto" />
+        </div>
+        <div className="mt-2 space-y-1.5">
+          {card.items.map((m) => {
+            const selectable = card.kind === "role";
+            return (
+              <button
+                key={m.label}
+                onClick={() => selectable && onSelectRole(m.label)}
+                disabled={!selectable}
+                className="flex w-full items-center justify-between rounded-lg border border-[var(--border)] px-3 py-2 text-left disabled:cursor-default"
+                style={selectable ? { cursor: "pointer" } : undefined}
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-[var(--text-primary)]">{m.label}</p>
+                  <p className="truncate text-[11px] text-[var(--text-secondary)]">{m.sub}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-sm font-bold text-[var(--ai-cyan)]">{m.score}%</span>
+                  {selectable && <ArrowUpRight className="h-3.5 w-3.5 text-[var(--ai-purple)]" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {card.kind === "role" && (
+          <p className="mt-2 text-[10px] text-[var(--text-muted)]">Select a role to open it in Career GPS →</p>
+        )}
+      </div>
+    );
+  }
+
   const autonomy: AutonomyLevel = card.type === "ticket" ? "auto" : "approval";
   return (
     <div className="mt-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">

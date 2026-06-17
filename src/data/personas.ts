@@ -24,6 +24,24 @@ export const personas: EmployeeTwin[] = [
     projects: ["Project Atlas", "Project Helix"],
     currentProject: "Project Helix",
     careerGoal: "AI Engineer",
+    dreyfus: "Competent",
+    mission: {
+      title: "AI Engineer",
+      deadline: "Dec 2026",
+      successProbability: 89,
+      targetReadiness: 90,
+    },
+    tracks: [
+      { name: "AI", focus: "Python · applied ML · LLM app patterns", progress: 34, primary: true },
+      { name: "Java Full Stack", focus: "Carry forward — Spring Boot, React depth", progress: 78 },
+      { name: "DevOps", focus: "CI/CD, containers, cloud deploy for AI apps", progress: 22 },
+    ],
+    careerHealth: {
+      score: 82,
+      growthVelocity: "Good",
+      marketRelevance: "Excellent",
+      promotionReadiness: "Moderate",
+    },
     learning: {
       currentCourse: "Python for Java Developers",
       completion: 34,

@@ -1,26 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowUpRight,
-  Award,
-  CalendarDays,
-  CheckCircle2,
   CircleAlert,
-  GraduationCap,
-  HeartPulse,
   Leaf,
-  Lightbulb,
-  Send,
-  TrendingDown,
   TrendingUp,
-  TriangleAlert,
-  UserPlus,
-  X,
+  UserRound,
+  Users,
 } from "lucide-react";
-import { CERT_ACCENT, managerData } from "@/data/manager";
+import { READINESS_STATUS, managerData, type ReadinessMember } from "@/data/manager";
+import { seedAgentEvents } from "@/data/agents";
+import { useOverlay } from "@/lib/useOverlay";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
+import { AgentActivity } from "@/components/AgentActivity";
+import { AgentChip } from "@/components/AgentChip";
+import { AgentDraftPanel, type AgentDraft } from "@/components/AgentDraftPanel";
+import { Briefing, type BriefingFinding } from "@/components/Briefing";
+import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
+import { ManagerWhatIf } from "@/components/ManagerWhatIf";
+import { AttritionSimulator } from "@/components/AttritionSimulator";
 
 const RISK_ACCENT: Record<"high" | "medium" | "low", Accent> = {
   high: "pink",
@@ -28,65 +28,75 @@ const RISK_ACCENT: Record<"high" | "medium" | "low", Accent> = {
   low: "blue",
 };
 
-type Compose = { title: string; body: string } | null;
+const BRIEFING_FINDINGS: BriefingFinding[] = [
+  { tone: "risk", text: "2 emerging skill gaps on the AI Transformation project" },
+  { tone: "risk", text: "1 burnout risk — Rajan, 8 late nights this week" },
+  { tone: "opportunity", text: "3 employees ready for AI projects" },
+  { tone: "win", text: "4 certifications completed this month" },
+];
 
-type MetricTile = {
-  label: string;
-  value: string;
-  suffix?: string;
-  accent: Accent;
-  note: string;
-  noteIcon: typeof TrendingDown;
-  noteAccent: Accent;
-  progress: number;
-};
+const BRIEFING_ACTIONS = [
+  "Move Priya to the AI Studio Pilot",
+  "Check in with Rajan this week",
+  "Approve the AI Upskilling Cohort",
+];
 
 export function ManagerCopilot() {
-  const [compose, setCompose] = useState<Compose>(null);
+  const [draft, setDraft] = useState<AgentDraft>(null);
+  const overlay = useOverlay();
+  const liveEvents = [
+    ...seedAgentEvents.filter((ev) => ev.phase !== "hr"),
+    ...overlay.events.filter((ev) => ev.phase !== "hr"),
+  ];
+  const committed = overlay.commitments;
 
-  const metrics: MetricTile[] = [
+  const keyActions: ActionItem[] = [
     {
-      label: "Team health",
-      value: String(managerData.teamHealthScore),
-      suffix: "%",
-      accent: "cyan",
-      note: "Down 5 pts from last week",
-      noteIcon: TrendingDown,
-      noteAccent: "pink",
-      progress: managerData.teamHealthScore,
-    },
-    {
-      label: "Attrition risk",
-      value: String(managerData.attritionRisks.length),
-      accent: "pink",
-      note: "Needs attention",
-      noteIcon: TriangleAlert,
-      noteAccent: "orange",
-      progress: Math.round((managerData.attritionRisks.length / managerData.teamSize) * 100),
-    },
-    {
-      label: "Active onboarding",
-      value: String(managerData.onboarding.length),
-      accent: "blue",
-      note: "On track",
-      noteIcon: CheckCircle2,
-      noteAccent: "cyan",
-      progress: Math.round((managerData.onboarding[0].day / 90) * 100),
-    },
-    {
-      label: "Certs this month",
-      value: String(managerData.certifications.length),
+      label: "Move Priya to the AI Studio Pilot",
+      sublabel: "89% ready · 91% project match",
+      verb: "Assign",
+      agent: "career",
       accent: "purple",
-      note: "Best month this quarter",
-      noteIcon: TrendingUp,
-      noteAccent: "cyan",
-      progress: 67,
+      onClick: () =>
+        setDraft({
+          agent: "career",
+          title: "AI Studio Pilot — Priya",
+          body: "Assigning Priya Sharma to the AI Studio Pilot — 89% ready for the AI Engineer track, 91% project match. — via Sakha",
+          autonomy: "approval",
+        }),
+    },
+    {
+      label: "Check in with Rajan",
+      sublabel: "burnout risk · 8 late nights",
+      verb: "Draft",
+      agent: "wellbeing",
+      accent: "pink",
+      onClick: () =>
+        setDraft({
+          agent: "wellbeing",
+          title: managerData.attritionRisks[0].draftTitle,
+          body: managerData.attritionRisks[0].draft,
+          autonomy: "approval",
+        }),
+    },
+    {
+      label: "Approve the AI Upskilling Cohort",
+      sublabel: "+3 deployable in 60 days",
+      verb: "Approve",
+      agent: "workforce",
+      accent: "cyan",
+      onClick: () =>
+        setDraft({
+          agent: "workforce",
+          title: "AI Upskilling Cohort",
+          body: "Approving the AI upskilling cohort for the team — projected readiness 82% → 91% within 60 days. — via Sakha",
+          autonomy: "approval",
+        }),
     },
   ];
 
   return (
     <div className="surface relative flex h-full flex-col overflow-hidden">
-      {/* TOP BAR */}
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-6 py-4">
         <div className="flex items-center gap-3">
           <span
@@ -96,413 +106,247 @@ export function ManagerCopilot() {
             VN
           </span>
           <div>
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">
-              {managerData.manager}
-            </h2>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">{managerData.manager}</h2>
             <p className="text-xs text-[var(--text-secondary)]">
-              Delivery Manager · {managerData.teamSize} direct reports
+              Manager Copilot · {managerData.teamSize} direct reports
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs text-[var(--text-secondary)]">
-            <CalendarDays className="h-3.5 w-3.5" />
-            Week of {managerData.weekEnding}
-          </span>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
-            style={{ background: accentRgba("purple", 0.16), color: ACCENT_HEX.purple }}
-          >
-            <Leaf className="h-3.5 w-3.5" />
-            Sakha
-          </span>
-        </div>
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+          style={{ background: accentRgba("purple", 0.16), color: ACCENT_HEX.purple }}
+        >
+          <Leaf className="h-3.5 w-3.5" />
+          Sakha
+        </span>
       </header>
 
       <div className="thin-scroll flex-1 space-y-5 overflow-y-auto p-6">
-        {/* METRIC TILES */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {metrics.map((m) => (
-            <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-[var(--text-secondary)]">{m.label}</p>
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ background: ACCENT_HEX[m.accent] }}
-                />
-              </div>
-              <p className="mt-2 text-3xl font-bold text-[var(--text-primary)]">
-                {m.value}
-                {m.suffix && (
-                  <span className="text-lg font-semibold text-[var(--text-secondary)]">
-                    {m.suffix}
-                  </span>
-                )}
-              </p>
-              <p
-                className="mt-1 flex items-center gap-1.5 text-xs font-medium"
-                style={{ color: ACCENT_HEX[m.noteAccent] }}
-              >
-                <m.noteIcon className="h-3.5 w-3.5" />
-                {m.note}
-              </p>
-              <div className="mt-3 h-1.5 rounded-full bg-[var(--border)]">
-                <div
-                  className="h-1.5 rounded-full"
-                  style={{ width: `${m.progress}%`, background: ACCENT_HEX[m.accent] }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* NEEDS ATTENTION + HEALTH RING */}
-        <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-          {/* Needs attention */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-                <CircleAlert className="h-4 w-4 text-[var(--ai-pink)]" />
-                Needs attention
-              </div>
-              <span
-                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
-                style={{ background: accentRgba("pink", 0.14), color: ACCENT_HEX.pink }}
-              >
-                {managerData.attritionRisks.length} flagged
-              </span>
-            </div>
-
-            <div className="mt-4 divide-y divide-[var(--border)]">
-              {managerData.attritionRisks.map((r) => {
-                const accent = RISK_ACCENT[r.riskLevel];
-                return (
-                  <div key={r.name} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
-                    <span
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                      style={{ background: accentRgba(accent, 0.18), color: ACCENT_HEX[accent] }}
-                    >
-                      {r.initial}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">{r.name}</p>
-                      <p className="mt-0.5 text-xs leading-5 text-[var(--text-secondary)]">
-                        {r.signal}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        <Badge accent={accent} label={`${cap(r.riskLevel)} risk`} />
-                        {r.tag && <Badge accent="orange" label={r.tag} />}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setCompose({ title: r.draftTitle, body: r.draft })}
-                      className="surface-hover inline-flex shrink-0 items-center gap-1 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-primary)]"
-                    >
-                      {r.actionLabel}
-                      <ArrowUpRight className="h-3.5 w-3.5" style={{ color: ACCENT_HEX[accent] }} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div
-              className="mt-4 rounded-lg border-l-2 p-3"
-              style={{ borderColor: ACCENT_HEX.purple, background: accentRgba("purple", 0.08) }}
-            >
-              <p className="text-xs leading-5 text-[var(--text-secondary)]">
-                <span className="font-semibold text-[var(--ai-purple)]">Sakha suggests: </span>
-                {managerData.attritionSuggestion}
-              </p>
-            </div>
-          </div>
-
-          {/* Team health score ring */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <HeartPulse className="h-4 w-4 text-[var(--ai-purple)]" />
-              Team health score
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <HealthRing value={managerData.teamHealthScore} />
-            </div>
-
-            <div className="mt-5 space-y-2">
-              <LegendRow color={ACCENT_HEX.cyan} label="Engaged" value={`${managerData.healthBreakdown.engaged} members`} />
-              <LegendRow color={ACCENT_HEX.orange} label="At risk" value={`${managerData.healthBreakdown.atRisk} members`} />
-              <LegendRow color="var(--text-muted)" label="On leave" value={`${managerData.healthBreakdown.onLeave} member`} />
-            </div>
-
-            <div className="mt-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-                4-week trend
-              </p>
-              <TrendBars data={managerData.teamHealthTrend} />
-            </div>
-          </div>
-        </div>
-
-        {/* BOTTOM ROW */}
-        <div className="grid gap-4 lg:grid-cols-3">
-          {/* Onboarding */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <UserPlus className="h-4 w-4 text-[var(--ai-blue)]" />
-              Active onboarding
-            </div>
-            {managerData.onboarding.map((o) => (
-              <div key={o.name} className="mt-4">
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
-                    style={{ background: accentRgba("blue", 0.18), color: ACCENT_HEX.blue }}
-                  >
-                    {o.initial}
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[var(--text-primary)]">{o.name}</p>
-                  </div>
-                  <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-medium"
-                    style={{ background: accentRgba("cyan", 0.16), color: ACCENT_HEX.cyan }}
-                  >
-                    Day {o.day}
-                  </span>
-                </div>
-                <div className="mt-3 h-1.5 rounded-full bg-[var(--border)]">
-                  <div
-                    className="h-1.5 rounded-full"
-                    style={{ width: `${Math.round((o.day / 90) * 100)}%`, background: ACCENT_HEX.blue }}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-[var(--text-secondary)]">
-                  {o.lastIssue} · next: {o.nextMilestone}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Certifications */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-                <Award className="h-4 w-4 text-[var(--ai-purple)]" />
-                Certifications
-              </div>
-              <span
-                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
-                style={{ background: accentRgba("purple", 0.14), color: ACCENT_HEX.purple }}
-              >
-                {managerData.certifications.length} this month
-              </span>
-            </div>
-            <div className="mt-3 space-y-2.5">
-              {managerData.certifications.map((c) => {
-                const accent = CERT_ACCENT[c.type];
-                return (
-                  <div key={c.name} className="flex items-center gap-2.5">
-                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCENT_HEX[accent] }} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-[var(--text-primary)]">
-                        {c.name}
-                      </p>
-                      <p className="truncate text-[11px] text-[var(--text-secondary)]">{c.cert}</p>
-                    </div>
-                    <span className="shrink-0 text-[11px] text-[var(--text-muted)]">{c.date}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Sakha recommends */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <Lightbulb className="h-4 w-4 text-[var(--ai-orange)]" />
-              Sakha recommends
-            </div>
-            <div className="mt-3 space-y-2.5">
-              {managerData.recommendations.map((rec, i) => (
-                <div key={rec.text} className="rounded-lg border border-[var(--border)] p-3">
-                  <div className="flex items-start gap-2">
-                    <span
-                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold"
-                      style={{ background: accentRgba(rec.accent, 0.16), color: ACCENT_HEX[rec.accent] }}
-                    >
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-[var(--text-primary)]">{rec.text}</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-[var(--text-secondary)]">
-                        {rec.rationale}
-                      </p>
-                      <button
-                        onClick={() => setCompose({ title: rec.draftTitle, body: rec.draft })}
-                        className="mt-2 inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white"
-                        style={{ background: ACCENT_HEX[rec.accent] }}
-                      >
-                        {rec.verb}
-                        <ArrowUpRight className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <ComposePanel compose={compose} onClose={() => setCompose(null)} />
-    </div>
-  );
-}
-
-function Badge({ accent, label }: { accent: Accent; label: string }) {
-  return (
-    <span
-      className="rounded-md px-2 py-0.5 text-[11px] font-medium"
-      style={{ background: accentRgba(accent, 0.16), color: ACCENT_HEX[accent] }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function LegendRow({ color, label, value }: { color: string; label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between text-xs">
-      <span className="flex items-center gap-2 text-[var(--text-secondary)]">
-        <span className="h-2 w-2 rounded-full" style={{ background: color }} />
-        {label}
-      </span>
-      <span className="font-medium text-[var(--text-primary)]">{value}</span>
-    </div>
-  );
-}
-
-function HealthRing({ value }: { value: number }) {
-  const R = 52;
-  const C = 2 * Math.PI * R;
-  const arc = (C * value) / 100;
-  return (
-    <div className="relative h-36 w-36">
-      <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
-        <circle cx="64" cy="64" r={R} fill="none" stroke="var(--border)" strokeWidth="11" />
-        <circle
-          cx="64"
-          cy="64"
-          r={R}
-          fill="none"
-          stroke={ACCENT_HEX.cyan}
-          strokeWidth="11"
-          strokeLinecap="round"
-          strokeDasharray={`${arc} ${C - arc}`}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-[var(--text-primary)]">{value}</span>
-        <span className="text-[11px] text-[var(--text-muted)]">out of 100</span>
-      </div>
-    </div>
-  );
-}
-
-function TrendBars({ data }: { data: number[] }) {
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  return (
-    <div className="mt-2 flex h-12 items-end gap-2">
-      {data.map((v, i) => {
-        const h = max === min ? 100 : 45 + ((v - min) / (max - min)) * 55;
-        const isLast = i === data.length - 1;
-        return (
+        {committed.length > 0 && (
           <div
-            key={i}
-            className="flex-1 rounded-md"
-            style={{
-              height: `${h}%`,
-              background: isLast ? ACCENT_HEX.cyan : accentRgba("cyan", 0.28),
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
+            className="flex items-center gap-2.5 rounded-xl border p-3"
+            style={{ borderColor: accentRgba("cyan", 0.5), background: accentRgba("cyan", 0.09) }}
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--ai-cyan)] opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--ai-cyan)]" />
+            </span>
+            <p className="text-xs leading-5 text-[var(--text-primary)]">
+              {committed.map((c) => `${c.name.split(" ")[0]} → ${c.goal}`).join(", ")} · the Career
+              Agent just aligned this to your delivery plan.
+            </p>
+          </div>
+        )}
 
-function ComposePanel({ compose, onClose }: { compose: Compose; onClose: () => void }) {
-  const [sent, setSent] = useState(false);
+        {/* KEY ACTIONS — pinned at top */}
+        <ActionCenter items={keyActions} />
 
-  function send() {
-    setSent(true);
-    setTimeout(() => {
-      setSent(false);
-      onClose();
-    }, 1300);
-  }
+        {/* HERO BRIEFING */}
+        <Briefing
+          greeting="Good morning, Vikram"
+          lead={`Overnight I analyzed your ${managerData.teamSize} team members.`}
+          findings={BRIEFING_FINDINGS}
+          actions={BRIEFING_ACTIONS}
+          agent="manager"
+        />
 
-  return (
-    <AnimatePresence onExitComplete={() => setSent(false)}>
-      {compose && (
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 24 }}
-          transition={{ type: "spring", stiffness: 280, damping: 26 }}
-          className="surface absolute bottom-4 right-4 z-30 w-[min(92%,360px)] p-4 shadow-2xl"
-          style={{ borderColor: accentRgba("purple", 0.5) }}
-        >
+        {/* TEAM READINESS MAP */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <Leaf className="h-4 w-4 text-[var(--ai-purple)]" />
-              {compose.title}
+              <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
+              Team readiness · {managerData.readinessProject}
             </div>
-            <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
-              <X className="h-4 w-4" />
-            </button>
+            <span className="text-sm font-bold text-[var(--text-primary)]">{managerData.projectReadiness}%</span>
           </div>
-          <p className="mt-1 text-[11px] text-[var(--text-muted)]">Sakha drafted this for you</p>
-          <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 text-xs leading-5 text-[var(--text-secondary)]">
-            {compose.body}
+          <div className="mt-2 h-2 rounded-full bg-[var(--border)]">
+            <div className="h-2 rounded-full" style={{ width: `${managerData.projectReadiness}%`, background: ACCENT_HEX.cyan }} />
           </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={send}
-              disabled={sent}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white"
-              style={{ background: sent ? ACCENT_HEX.cyan : ACCENT_HEX.purple }}
-            >
-              {sent ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Sent via Sakha
-                </>
-              ) : (
-                <>
-                  <Send className="h-3.5 w-3.5" />
-                  Send via Sakha
-                </>
-              )}
-            </button>
-            <button
-              onClick={onClose}
-              className="surface-hover rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)]"
-            >
-              Edit
-            </button>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {managerData.readinessTeam.map((m) => (
+              <ReadinessRow key={m.name} member={m} />
+            ))}
           </div>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
-            <GraduationCap className="h-3 w-3" />
-            Needs your approval before anything is sent · logged to audit trail
+        </div>
+
+        {/* WHAT-IF (signature) */}
+        <ManagerWhatIf />
+
+        {/* ATTRITION DEEP-DIVE (Rajan) */}
+        <AttritionSimulator />
+
+        {/* SPOTLIGHT + RISK CENTER */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <EmployeeSpotlight onAct={setDraft} />
+          <RiskCenter onAct={setDraft} flags={overlay.retentionFlags} />
+        </div>
+
+        {/* TALENT PIPELINE */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+            <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
+            AI talent pipeline
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            <PipelineCell label="Ready today" value={managerData.talentPipeline.readyToday} accent="cyan" />
+            <PipelineCell label="Ready in 30 days" value={managerData.talentPipeline.ready30} accent="blue" />
+            <PipelineCell label="Ready in 90 days" value={managerData.talentPipeline.ready90} accent="purple" />
+          </div>
+        </div>
+
+        {/* AGENT ACTIVITY */}
+        <AgentActivity events={liveEvents} title="Agent activity" compact />
+      </div>
+
+      <AgentDraftPanel draft={draft} onClose={() => setDraft(null)} />
+    </div>
   );
 }
 
-function cap(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+function ReadinessRow({ member }: { member: ReadinessMember }) {
+  const { label, accent } = READINESS_STATUS[member.status];
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-[var(--border)] p-2.5">
+      <span
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+        style={{ background: accentRgba(accent, 0.16), color: ACCENT_HEX[accent] }}
+      >
+        {member.initial}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-[var(--text-primary)]">{member.name}</p>
+        <p className="truncate text-[11px] text-[var(--text-secondary)]">{member.note}</p>
+      </div>
+      <span
+        className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold"
+        style={{ background: accentRgba(accent, 0.16), color: ACCENT_HEX[accent] }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function EmployeeSpotlight({ onAct }: { onAct: (d: AgentDraft) => void }) {
+  const s = managerData.spotlight;
+  return (
+    <div
+      className="rounded-xl border p-5"
+      style={{ borderColor: accentRgba("purple", 0.4), background: accentRgba("purple", 0.06) }}
+    >
+      <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+        <UserRound className="h-4 w-4 text-[var(--ai-purple)]" />
+        Employee spotlight
+        <AgentChip agent="career" status="done" />
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-base font-semibold"
+          style={{ background: accentRgba("purple", 0.18), color: ACCENT_HEX.purple }}
+        >
+          {s.initial}
+        </span>
+        <div>
+          <p className="text-base font-semibold text-[var(--text-primary)]">{s.name}</p>
+          <p className="text-xs text-[var(--text-secondary)]">{s.role} → {s.goal}</p>
+        </div>
+        <span className="ml-auto text-right">
+          <span className="block text-2xl font-bold text-[var(--text-primary)]">{s.readiness}%</span>
+          <span className="block text-[10px] text-[var(--text-muted)]">AI ready</span>
+        </span>
+      </div>
+      <button
+        onClick={() =>
+          onAct({
+            agent: "career",
+            title: "AI Studio Pilot — Priya",
+            body: `Assigning Priya Sharma to the AI Studio Pilot. She's ${s.readiness}% ready for the AI Engineer track and a 91% match for the project. Manager: Vikram. — via Sakha`,
+            autonomy: "approval",
+          })
+        }
+        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+        style={{ background: ACCENT_HEX.purple }}
+      >
+        {s.suggestedAction}
+        <ArrowUpRight className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function RiskCenter({ onAct, flags }: { onAct: (d: AgentDraft) => void; flags: string[] }) {
+  const priyaFlagged = flags.includes("priya");
+  return (
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+      <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+        <CircleAlert className="h-4 w-4 text-[var(--ai-pink)]" />
+        Risk center · top 3
+      </div>
+      <div className="mt-3 space-y-2">
+        {priyaFlagged && (
+          <motion.button
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() =>
+              onAct({
+                agent: "wellbeing",
+                title: "Growth 1:1 — Priya",
+                body: "Hi Priya, do you have 30 minutes this week? I'd love to hear how things are going and talk through your AI Engineer path — there are a couple of internal roles I think you'd be great for. Pick any slot. — Vikram",
+                autonomy: "approval",
+              })
+            }
+            className="flex w-full items-center gap-3 rounded-lg border p-2.5 text-left"
+            style={{ borderColor: accentRgba("orange", 0.5), background: accentRgba("orange", 0.07) }}
+          >
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: ACCENT_HEX.orange }} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-[var(--text-primary)]">Priya Sharma</p>
+              <p className="truncate text-[11px] text-[var(--text-secondary)]">Retention risk · raised via Sakha just now</p>
+            </div>
+            <ArrowUpRight className="h-3.5 w-3.5 shrink-0" style={{ color: ACCENT_HEX.orange }} />
+          </motion.button>
+        )}
+        {managerData.attritionRisks.slice(0, priyaFlagged ? 1 : 2).map((r) => {
+          const accent = RISK_ACCENT[r.riskLevel];
+          return (
+            <button
+              key={r.name}
+              onClick={() => onAct({ agent: "wellbeing", title: r.draftTitle, body: r.draft, autonomy: "approval" })}
+              className="flex w-full items-center gap-3 rounded-lg border border-[var(--border)] p-2.5 text-left"
+            >
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: ACCENT_HEX[accent] }} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-[var(--text-primary)]">{r.name}</p>
+                <p className="truncate text-[11px] text-[var(--text-secondary)]">{r.tag ?? r.signal}</p>
+              </div>
+              <ArrowUpRight className="h-3.5 w-3.5 shrink-0" style={{ color: ACCENT_HEX[accent] }} />
+            </button>
+          );
+        })}
+        <div className="flex items-center gap-3 rounded-lg border border-[var(--border)] p-2.5">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: ACCENT_HEX.orange }} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-[var(--text-primary)]">AI skills shortage</p>
+            <p className="truncate text-[11px] text-[var(--text-secondary)]">Demand outpaces team supply</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PipelineCell({ label, value, accent }: { label: string; value: number; accent: Accent }) {
+  return (
+    <div className="rounded-lg border border-[var(--border)] p-3 text-center">
+      <motion.p
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-3xl font-bold tabular-nums"
+        style={{ color: ACCENT_HEX[accent] }}
+      >
+        {value}
+      </motion.p>
+      <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">{label}</p>
+    </div>
+  );
 }

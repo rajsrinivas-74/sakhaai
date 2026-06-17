@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  MessagesSquare,
+  Network,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -13,7 +15,9 @@ import type { EmployeeTwin } from "@/types/sakha";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 import { SakhaLogo } from "@/components/SakhaLogo";
 
-export type View = "chat" | "career" | "manager";
+export type View = "chat" | "career" | "manager" | "hr" | "ask";
+
+export type Role = "employee" | "manager" | "hr";
 
 type NavItem = { id: View; label: string; icon: typeof MessageCircle; accent: Accent };
 
@@ -24,7 +28,19 @@ const EMPLOYEE_NAV: NavItem[] = [
 
 const MANAGER_NAV: NavItem[] = [
   { id: "manager", label: "Manager Copilot", icon: LayoutDashboard, accent: "cyan" },
+  { id: "ask", label: "Ask Sakha", icon: MessagesSquare, accent: "purple" },
 ];
+
+const HR_NAV: NavItem[] = [
+  { id: "hr", label: "Workforce Intelligence", icon: Network, accent: "blue" },
+  { id: "ask", label: "Ask Sakha", icon: MessagesSquare, accent: "purple" },
+];
+
+const NAV_FOR: Record<Role, NavItem[]> = {
+  employee: EMPLOYEE_NAV,
+  manager: MANAGER_NAV,
+  hr: HR_NAV,
+};
 
 const STAGE_ACCENT: Record<string, Accent> = {
   blue: "blue",
@@ -34,8 +50,11 @@ const STAGE_ACCENT: Record<string, Accent> = {
 
 type Identity = { name: string; role: string; stage: string; initial: string; accent: Accent };
 
-function getIdentity(isManager: boolean, twin: EmployeeTwin | null): Identity {
-  if (isManager) {
+function getIdentity(role: Role, twin: EmployeeTwin | null): Identity {
+  if (role === "hr") {
+    return { name: "Anita Desai", role: "Capability Manager", stage: "Workforce view", initial: "A", accent: "blue" };
+  }
+  if (role === "manager") {
     return { name: "Vikram Nair", role: "Delivery Manager", stage: "Manager view", initial: "V", accent: "blue" };
   }
   if (twin) {
@@ -52,18 +71,19 @@ function getIdentity(isManager: boolean, twin: EmployeeTwin | null): Identity {
 
 /* ── Desktop sidebar (lg and up) ───────────────────────────────────────── */
 export function Sidebar({
-  isManager,
+  role,
   twin,
   view,
   onView,
 }: {
-  isManager: boolean;
+  role: Role;
   twin: EmployeeTwin | null;
   view: View;
   onView: (v: View) => void;
 }) {
-  const identity = getIdentity(isManager, twin);
-  const nav = isManager ? MANAGER_NAV : EMPLOYEE_NAV;
+  const identity = getIdentity(role, twin);
+  const nav = NAV_FOR[role];
+  const isEmployee = role === "employee";
 
   return (
     <aside className="surface flex h-full flex-col gap-6 p-5" style={{ background: "var(--sidebar)" }}>
@@ -99,9 +119,10 @@ export function Sidebar({
         </div>
         <Link
           href="/"
-          className="surface-hover mt-2 flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)]"
+          className="mt-2 flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold text-[var(--text-primary)] transition hover:brightness-110"
+          style={{ background: accentRgba("blue", 0.16), borderColor: accentRgba("blue", 0.55) }}
         >
-          <LogOut className="h-3.5 w-3.5" />
+          <LogOut className="h-3.5 w-3.5" style={{ color: ACCENT_HEX.blue }} />
           Switch user · via SSO
         </Link>
       </div>
@@ -119,13 +140,15 @@ export function Sidebar({
         <div className="flex items-center gap-2 text-[var(--ai-cyan)]">
           <ShieldCheck className="h-4 w-4" />
           <span className="text-xs font-semibold uppercase tracking-[0.16em]">
-            {isManager ? "Manager access" : "Private to you"}
+            {isEmployee ? "Private to you" : role === "hr" ? "Capability access" : "Manager access"}
           </span>
         </div>
         <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-          {isManager
-            ? "Managers see team-level signals — not individual chats or Digital Twins."
-            : "You only see your own Digital Twin. Switching identity re-authenticates via SSO."}
+          {isEmployee
+            ? "You only see your own Digital Twin. Switching identity re-authenticates via SSO."
+            : role === "hr"
+              ? "Capability Managers see aggregated workforce signals — not individual chats or Digital Twins."
+              : "Managers see team-level signals — not individual chats or Digital Twins."}
         </p>
       </div>
     </aside>
@@ -134,20 +157,21 @@ export function Sidebar({
 
 /* ── Mobile top bar (below lg) ─────────────────────────────────────────── */
 export function MobileBar({
-  isManager,
+  role,
   twin,
   view,
   onView,
   onOpenTwin,
 }: {
-  isManager: boolean;
+  role: Role;
   twin: EmployeeTwin | null;
   view: View;
   onView: (v: View) => void;
   onOpenTwin: () => void;
 }) {
-  const identity = getIdentity(isManager, twin);
-  const nav = isManager ? MANAGER_NAV : EMPLOYEE_NAV;
+  const identity = getIdentity(role, twin);
+  const nav = NAV_FOR[role];
+  const isEmployee = role === "employee";
 
   return (
     <div className="surface flex flex-col gap-2.5 p-2.5" style={{ background: "var(--sidebar)" }}>
@@ -159,7 +183,7 @@ export function MobileBar({
           <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{identity.name}</p>
           <p className="truncate text-[11px] text-[var(--text-secondary)]">{identity.stage}</p>
         </div>
-        {!isManager && twin && (
+        {isEmployee && twin && (
           <button
             onClick={onOpenTwin}
             className="surface-hover inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-2 text-xs font-medium text-[var(--text-secondary)]"

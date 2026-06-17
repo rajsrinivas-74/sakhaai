@@ -48,14 +48,53 @@ export const CERT_ACCENT: Record<CertType, Accent> = {
   agile: "orange",
 };
 
+export type ReadinessStatus = "ready" | "ready-soon" | "gap" | "risk";
+
+export type ReadinessMember = {
+  name: string;
+  initial: string;
+  status: ReadinessStatus;
+  note: string;
+};
+
+export const READINESS_STATUS: Record<ReadinessStatus, { label: string; accent: Accent }> = {
+  ready: { label: "Ready", accent: "cyan" },
+  "ready-soon": { label: "Ready soon", accent: "blue" },
+  gap: { label: "Skill gap", accent: "orange" },
+  risk: { label: "Burnout risk", accent: "pink" },
+};
+
 export const managerData = {
   manager: "Vikram Nair",
   weekEnding: "June 20, 2026",
   teamHealthScore: 84,
   teamHealthTrend: [89, 91, 88, 86, 84],
-  teamSize: 8,
+  teamSize: 18,
 
-  healthBreakdown: { engaged: 5, atRisk: 2, onLeave: 1 },
+  healthBreakdown: { engaged: 13, atRisk: 4, onLeave: 1 },
+
+  // The project Vikram is staffing toward, with member-level readiness (RAG).
+  readinessProject: "AI Transformation Project",
+  projectReadiness: 82,
+  readinessTeam: [
+    { name: "Priya Sharma", initial: "P", status: "ready-soon", note: "AI path · 89% ready" },
+    { name: "Arjun Mehta", initial: "A", status: "ready", note: "Full-stack, AI-curious" },
+    { name: "Rajan Krishnan", initial: "R", status: "risk", note: "Burnout · 8 late nights" },
+    { name: "Meera Kumar", initial: "M", status: "gap", note: "Needs GenAI fundamentals" },
+  ] as ReadinessMember[],
+
+  // Future supply, not current allocation.
+  talentPipeline: { readyToday: 4, ready30: 6, ready90: 8 },
+
+  // The one person Sakha says to focus on this week.
+  spotlight: {
+    name: "Priya Sharma",
+    initial: "P",
+    role: "Java Full Stack Developer",
+    goal: "AI Engineer",
+    readiness: 89,
+    suggestedAction: "Assign to AI Studio Pilot",
+  },
 
   attritionSuggestion:
     "Schedule Rajan's 1:1 before Thursday. Meera may benefit from a casual coffee chat. Both have been high performers — early intervention matters.",
@@ -107,7 +146,7 @@ export const managerData = {
   ] as OnboardingTracker[],
 
   certifications: [
-    { name: "Priya Sharma", initial: "P", cert: "AWS Solutions Architect", type: "cloud", date: "Jun 15" },
+    { name: "Priya Sharma", initial: "P", cert: "Azure AI Fundamentals (AI-900)", type: "cloud", date: "Jun 15" },
     { name: "Dev Rao", initial: "D", cert: "PMP", type: "management", date: "Jun 12" },
     { name: "Anita Menon", initial: "A", cert: "Kubernetes CKA", type: "devops", date: "Jun 10" },
     { name: "Kiran Bose", initial: "K", cert: "Scrum Master", type: "agile", date: "Jun 8" },

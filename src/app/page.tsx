@@ -33,6 +33,7 @@ const STACK = [
 type PersonaCard = {
   initial: string;
   name: string;
+  persona: string;
   role: string;
   tag: string;
   scenario: string;
@@ -46,6 +47,7 @@ const PERSONAS: PersonaCard[] = [
   {
     initial: "P",
     name: "Priya",
+    persona: "Employee",
     role: "Java Developer → AI Engineer",
     tag: "Lateral hire · Month 3",
     scenario: "“How do I become an AI Engineer?”",
@@ -55,30 +57,9 @@ const PERSONAS: PersonaCard[] = [
     cta: "Open Career GPS",
   },
   {
-    initial: "A",
-    name: "Arjun",
-    role: "Graduate Engineer Trainee",
-    tag: "New joiner · Day 8",
-    scenario: "“My VPN isn’t connecting.”",
-    does: "The onboarding agent raises ticket #INC-2948 autonomously and unblocks Day 1 with mobile email access.",
-    accent: "cyan",
-    href: "/app?persona=arjun",
-    cta: "Open as Arjun",
-  },
-  {
-    initial: "R",
-    name: "Rajan",
-    role: "Senior QA Engineer",
-    tag: "Tenured · Year 4",
-    scenario: "8 late nights this week.",
-    does: "A wellbeing signal is caught — a gentle check-in, quietly flagged to the manager under consent.",
-    accent: "orange",
-    href: "/app?persona=rajan",
-    cta: "Open as Rajan",
-  },
-  {
     initial: "V",
     name: "Vikram",
+    persona: "Manager",
     role: "Delivery Manager",
     tag: "Manager view",
     scenario: "Team health 84% ↓",
@@ -86,6 +67,18 @@ const PERSONAS: PersonaCard[] = [
     accent: "blue",
     href: "/app?view=manager",
     cta: "Open Manager Copilot",
+  },
+  {
+    initial: "A",
+    name: "Anita",
+    persona: "Capability Manager",
+    role: "Capability Manager",
+    tag: "Workforce view",
+    scenario: "AI demand 92 vs supply 38",
+    does: "Workforce Intelligence shows the org's skill demand-vs-supply, triages reskilling candidates, and drafts retention moves — Priya included.",
+    accent: "blue",
+    href: "/app?view=hr",
+    cta: "Open Workforce Intelligence",
   },
 ];
 
@@ -148,7 +141,7 @@ export default function Home() {
       <Nav />
 
       {/* HERO */}
-      <section className="mx-auto max-w-6xl px-5 pt-14 pb-12 sm:pt-20">
+      <section className="mx-auto max-w-6xl px-5 pt-8 pb-10">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,38 +153,69 @@ export default function Home() {
             HCLTech × OpenAI · Agentic AI Hackathon · Track 2
           </span>
 
-          <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-6xl">
-            From offer letter to alumni network,{" "}
-            <span className="brand-text">one trusted companion.</span>
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-6xl">
+            Sakha AI
+            <span className="mt-1 block brand-text text-3xl sm:text-5xl">
+              The Employee Success Operating System
+            </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
-            Sakha is an Employee Success Operating System — a Digital-Twin–powered agentic AI
-            that predicts friction, prevents disengagement, and resolves journeys across
-            onboarding, careers, HR, and manager insight.
+          <p className="mx-auto mt-4 max-w-2xl text-base font-medium text-[var(--text-secondary)] sm:text-xl">
+            From Employee Goals to Workforce Transformation.
           </p>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/app"
-              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white glow-purple"
-              style={{ background: ACCENT_HEX.purple }}
-            >
-              Launch the live demo
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/app?persona=priya&view=career"
-              className="surface-hover inline-flex items-center gap-2 rounded-xl border border-[var(--border)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)]"
-            >
-              <Compass className="h-4 w-4 text-[var(--ai-purple)]" />
-              Walk Priya’s journey
-            </Link>
-          </div>
-          <p className="mt-4 text-xs text-[var(--text-muted)]">
-            Runs with no API key — fully demo-safe and offline-proof.
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[var(--text-muted)]">
+            Choose a role to enter the live workspace.
           </p>
         </motion.div>
+
+        {/* PERSONA LAUNCH CARDS — the three doors in */}
+        <div id="personas" className="mt-7 grid scroll-mt-20 gap-4 sm:grid-cols-3">
+          {PERSONAS.map((p, i) => (
+            <Reveal key={p.name} delay={i * 0.06}>
+              <Link
+                href={p.href}
+                className="surface surface-hover group flex h-full flex-col p-5"
+                style={{ borderColor: accentRgba(p.accent, 0.4) }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg font-semibold"
+                    style={{ background: accentRgba(p.accent, 0.18), color: ACCENT_HEX[p.accent] }}
+                  >
+                    {p.initial}
+                  </span>
+                  <div className="min-w-0 text-left">
+                    <p className="text-base font-semibold text-[var(--text-primary)]">{p.name}</p>
+                    <p
+                      className="text-[11px] font-semibold uppercase tracking-[0.16em]"
+                      style={{ color: ACCENT_HEX[p.accent] }}
+                    >
+                      {p.persona}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-left text-sm font-medium text-[var(--text-primary)]">{p.scenario}</p>
+                <p className="mt-1.5 flex-1 text-left text-xs leading-5 text-[var(--text-secondary)]">{p.does}</p>
+                <span
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold transition group-hover:gap-2.5"
+                  style={{ color: ACCENT_HEX[p.accent] }}
+                >
+                  {p.cta}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+
+        <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
+          New here?{" "}
+          <Link href="/app?persona=priya&view=career" className="font-semibold text-[var(--ai-purple)] hover:underline">
+            Start with Priya&rsquo;s journey →
+          </Link>{" "}
+          · Runs with no API key, fully demo-safe.
+        </p>
 
         <HeroPreview />
 
@@ -213,54 +237,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* PERSONAS */}
-      <Section
-        id="personas"
-        eyebrow="One AI, every employee"
-        title="Meet the people Sakha walks beside"
-        subtitle="Pick a persona to enter the workspace as them — the demo mocks SSO and loads their Digital Twin."
-      >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PERSONAS.map((p, i) => (
-            <Reveal key={p.name} delay={i * 0.06}>
-              <Link
-                href={p.href}
-                className="surface surface-hover group flex h-full flex-col p-5"
-                style={{ borderColor: accentRgba(p.accent, 0.3) }}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className="flex h-11 w-11 items-center justify-center rounded-xl text-lg font-semibold"
-                    style={{ background: accentRgba(p.accent, 0.18), color: ACCENT_HEX[p.accent] }}
-                  >
-                    {p.initial}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-base font-semibold text-[var(--text-primary)]">{p.name}</p>
-                    <p className="truncate text-xs text-[var(--text-secondary)]">{p.role}</p>
-                  </div>
-                </div>
-                <span
-                  className="mt-4 w-fit rounded-full px-2.5 py-1 text-[11px] font-medium"
-                  style={{ background: accentRgba(p.accent, 0.14), color: ACCENT_HEX[p.accent] }}
-                >
-                  {p.tag}
-                </span>
-                <p className="mt-3 text-sm font-medium text-[var(--text-primary)]">{p.scenario}</p>
-                <p className="mt-2 flex-1 text-xs leading-5 text-[var(--text-secondary)]">{p.does}</p>
-                <span
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold transition group-hover:gap-2.5"
-                  style={{ color: ACCENT_HEX[p.accent] }}
-                >
-                  {p.cta}
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </span>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
 
       {/* FEATURES */}
       <Section

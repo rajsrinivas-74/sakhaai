@@ -2,18 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sidebar, MobileBar, type View } from "@/components/Sidebar";
+import { Sidebar, MobileBar, type View, type Role } from "@/components/Sidebar";
 import { SakhaChat } from "@/components/SakhaChat";
 import { CareerGps } from "@/components/CareerGps";
 import { ManagerCopilot } from "@/components/ManagerCopilot";
+import { HRCommandCenter } from "@/components/HRCommandCenter";
+import { AskSakhaView } from "@/components/AskSakhaView";
 import { DigitalTwin } from "@/components/DigitalTwin";
+import { AgentDock } from "@/components/AgentDock";
+import { LiveRail } from "@/components/LiveRail";
 import { ProactiveNotification } from "@/components/ProactiveNotification";
 import { personaById } from "@/data/personas";
 import { proactiveNotifications } from "@/data/notifications";
 import type { CareerGpsResult, PersonaId, ProactiveNotification as Notif } from "@/types/sakha";
 
-/** An authenticated actor is either an employee or the manager lens. */
-export type Actor = PersonaId | "vikram";
+/** An authenticated actor is an employee, the manager lens, or the HR lens. */
+export type Actor = PersonaId | "vikram" | "anita";
 
 export function SakhaApp({
   actor = "priya",
@@ -22,12 +26,20 @@ export function SakhaApp({
   actor?: Actor;
   initialView?: View;
 } = {}) {
-  const isManager = actor === "vikram";
-  const persona: PersonaId | null = isManager ? null : actor;
+  const role: Role = actor === "vikram" ? "manager" : actor === "anita" ? "hr" : "employee";
+  const isManager = role === "manager";
+  const isEmployee = role === "employee";
+  const persona: PersonaId | null = isEmployee ? (actor as PersonaId) : null;
   const twin = persona ? personaById(persona) : null;
 
   const [view, setView] = useState<View>(
-    isManager ? "manager" : initialView === "career" ? "career" : "chat",
+    role === "manager"
+      ? "manager"
+      : role === "hr"
+        ? "hr"
+        : initialView === "career"
+          ? "career"
+          : "chat",
   );
   const [careerPrefill, setCareerPrefill] = useState<string | null>(
     !isManager && initialView === "career" && twin ? twin.careerGoal : null,
@@ -77,12 +89,12 @@ export function SakhaApp({
   }
 
   return (
-    <div className="app-ambient min-h-screen p-3 sm:p-4">
-      <div className="mx-auto grid max-w-[1400px] gap-4 lg:h-[calc(100vh-2rem)] lg:grid-cols-[240px_1fr]">
+    <div className="app-ambient min-h-screen p-3 pb-20 sm:p-4 sm:pb-20 xl:pb-4">
+      <div className="mx-auto grid max-w-[1600px] gap-4 lg:h-[calc(100vh-2rem-64px)] lg:grid-cols-[240px_1fr] xl:h-[calc(100vh-2rem)]">
         {/* Mobile: compact top bar */}
         <div className="lg:hidden">
           <MobileBar
-            isManager={isManager}
+            role={role}
             twin={twin}
             view={view}
             onView={navView}
@@ -92,17 +104,28 @@ export function SakhaApp({
 
         {/* Desktop: full sidebar */}
         <div className="hidden lg:block">
-          <Sidebar isManager={isManager} twin={twin} view={view} onView={navView} />
+          <Sidebar role={role} twin={twin} view={view} onView={navView} />
         </div>
 
         <main className="min-h-0 max-lg:min-h-[72vh]">
-          {isManager ? (
-            <div className="h-full min-h-0 max-lg:min-h-[72vh]">
-              <ManagerCopilot />
+          {isManager || role === "hr" ? (
+            <div className="grid h-full min-h-0 gap-4 max-lg:min-h-[72vh] xl:grid-cols-[1fr_340px]">
+              <div className="min-h-0 max-lg:min-h-[72vh]">
+                {view === "ask" ? (
+                  <AskSakhaView role={isManager ? "manager" : "hr"} />
+                ) : isManager ? (
+                  <ManagerCopilot />
+                ) : (
+                  <HRCommandCenter />
+                )}
+              </div>
+              <div className="hidden min-h-0 xl:block">
+                <LiveRail />
+              </div>
             </div>
           ) : (
             twin && (
-              <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[1fr_330px]">
+              <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[1fr_340px]">
                 <div className="min-h-0 max-lg:min-h-[72vh]">
                   {view === "career" ? (
                     <CareerGps twin={twin} prefillGoal={careerPrefill} onResult={handleGpsResult} />
@@ -110,8 +133,13 @@ export function SakhaApp({
                     <SakhaChat twin={twin} onNavigateCareer={navigateCareer} />
                   )}
                 </div>
-                <div className="hidden min-h-0 xl:block">
-                  <DigitalTwin twin={twin} gps={gpsResult} updatedLabel={twinUpdated} />
+                <div className="hidden min-h-0 xl:flex xl:flex-col xl:gap-4">
+                  <div className="h-[46%] min-h-0 shrink-0">
+                    <DigitalTwin twin={twin} gps={gpsResult} updatedLabel={twinUpdated} />
+                  </div>
+                  <div className="min-h-0 flex-1">
+                    <LiveRail />
+                  </div>
                 </div>
               </div>
             )
@@ -119,7 +147,12 @@ export function SakhaApp({
         </main>
       </div>
 
-      {!isManager && (
+      {/* Mobile / tablet (below xl) keep the bottom dock; xl+ uses the right rail */}
+      <div className="xl:hidden">
+        <AgentDock />
+      </div>
+
+      {isEmployee && (
         <ProactiveNotification
           notif={notif}
           onAction={handleNotifAction}
@@ -129,7 +162,7 @@ export function SakhaApp({
 
       {/* Mobile-only Digital Twin slide-over */}
       <AnimatePresence>
-        {twinOpen && twin && !isManager && (
+        {twinOpen && twin && isEmployee && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

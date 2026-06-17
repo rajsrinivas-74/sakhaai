@@ -4,7 +4,7 @@ export type ScriptedResponse = {
   text: string;
   card?: ChatCard;
   quickReplies?: string[];
-  action?: "navigate_to_career_gps";
+  action?: "navigate_to_career_gps" | "flag_retention";
 };
 
 /**
@@ -13,10 +13,64 @@ export type ScriptedResponse = {
  */
 export const scriptedResponses: { match: string[]; response: ScriptedResponse }[] = [
   {
-    match: ["become an ai engineer", "ai engineer", "career path", "map my"],
+    match: [
+      "become an ai engineer",
+      "ai engineer",
+      "career path",
+      "map my",
+      "move into ai",
+      "move to ai",
+      "same role for 4 years",
+      "same role for four years",
+      "what should i do next",
+      "grow into ai",
+      "ai path",
+      "show me my ai path",
+    ],
     response: {
-      text: "Great goal — let me map your path against your Digital Twin. Opening Career GPS…",
+      text: "I hear you — four years in one role is exactly when a deliberate move matters most. Your Java and cloud base gives you a real head start toward AI. Let me build your mission against your Digital Twin. Opening Career GPS…",
       action: "navigate_to_career_gps",
+    },
+  },
+  {
+    match: ["what role should i target", "role should i target", "target next", "which role", "what role"],
+    response: {
+      text: "Based on your Digital Twin and the AI Engineer mission, here are the strongest internal role matches. Select one and I'll open it in Career GPS.",
+      card: {
+        type: "matches",
+        title: "Role matches",
+        kind: "role",
+        items: [
+          { label: "Associate AI Engineer", sub: "Enterprise AI Studio", score: 82 },
+          { label: "GenAI Application Developer", sub: "Digital Foundation", score: 76 },
+          { label: "AI Platform Engineer", sub: "Cloud Native Labs", score: 71 },
+        ],
+      },
+    },
+  },
+  {
+    match: ["projects that match", "any projects", "matching projects", "project match", "projects matching"],
+    response: {
+      text: "Yes — three live projects match your skills and your AI direction. The Opportunity Agent ranked them for you.",
+      card: {
+        type: "matches",
+        title: "Project matches",
+        kind: "project",
+        items: [
+          { label: "GenAI Support Copilot", sub: "Innovation Lab · build LLM app", score: 91 },
+          { label: "RAG Search on Project Helix", sub: "your current project", score: 84 },
+          { label: "AI Platform Pilot", sub: "Cloud Native Labs", score: 73 },
+        ],
+      },
+      quickReplies: ["Express interest in the top match", "What role should I target next?"],
+    },
+  },
+  {
+    match: ["considering resigning", "resign", "thinking of leaving", "want to quit", "quit", "leaving the company"],
+    response: {
+      text: "Thank you for telling me, Priya — that takes trust, and I'm glad you did. Before anything, your growth matters here: you're 89% of the way to an AI Engineer move, with internal roles already matching you. With your consent I've gently flagged this to Vikram so he can support a growth conversation — no pressure, and nothing about why. Want to look at your AI path together?",
+      action: "flag_retention",
+      quickReplies: ["Show me my AI path", "I'd like to talk to someone"],
     },
   },
   {
@@ -43,13 +97,13 @@ export const scriptedResponses: { match: string[]; response: ScriptedResponse }[
   {
     match: ["reimburse", "reimbursement", "cert claim", "certification claim"],
     response: {
-      text: "HCLTech covers 100% for AWS certifications. I've pre-filled your reimbursement request — just confirm and I'll submit it. Approval usually takes 3 days.",
+      text: "HCLTech covers 100% for Azure certifications. I've pre-filled your reimbursement request — just confirm and I'll submit it. Approval usually takes 3 days.",
       card: {
         type: "form",
         title: "Certification Reimbursement",
         fields: [
           { label: "Employee", value: "Priya Sharma" },
-          { label: "Certification", value: "AWS Solutions Architect" },
+          { label: "Certification", value: "Azure AI Fundamentals (AI-900)" },
           { label: "Amount", value: "₹12,500" },
           { label: "Status", value: "Pre-filled — awaiting confirmation" },
         ],
