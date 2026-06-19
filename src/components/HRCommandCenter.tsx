@@ -32,6 +32,9 @@ import { AgentActivity } from "@/components/AgentActivity";
 import { AgentChip } from "@/components/AgentChip";
 import { AgentDraftPanel, type AgentDraft } from "@/components/AgentDraftPanel";
 import { WorkforceSimulator } from "@/components/WorkforceSimulator";
+import { TransformationScorecard } from "@/components/TransformationScorecard";
+import { ProgramDemandTracker } from "@/components/ProgramDemandTracker";
+import { BuildVsBuyPortfolio } from "@/components/BuildVsBuyPortfolio";
 import { Briefing, type BriefingFinding } from "@/components/Briefing";
 import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
 
@@ -190,8 +193,14 @@ export function HRCommandCenter({
           source={source}
         />
 
+        {/* TRANSFORMATION SCORECARD — OKRs vs target */}
+        <TransformationScorecard />
+
         {/* HERO — RESKILLING SIMULATOR */}
         <WorkforceSimulator />
+
+        {/* STRATEGIC PROGRAM DEMAND TRACKER */}
+        <ProgramDemandTracker onAct={setDraft} />
 
         {/* ROLE-LEVEL GAP MAP + AGENT ACTIVITY */}
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
@@ -218,6 +227,9 @@ export function HRCommandCenter({
 
         {/* AI DELIVERY MANAGER — build vs buy (Priya's cohort) */}
         <AiDeliveryManagerCase onAct={setDraft} />
+
+        {/* BUILD VS BUY — full critical-role portfolio */}
+        <BuildVsBuyPortfolio />
 
         {/* WORKFORCE SIGNALS */}
         <div className="rounded-xl attr-card bg-[var(--bg)] p-5">

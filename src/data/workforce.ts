@@ -136,6 +136,135 @@ export const retentionIntel = {
   lever: "Internal mobility",
 };
 
+/* ── Transformation scorecard ──────────────────────────────────────────────
+ * The CPO's OKRs — each metric tracked against a target with a 5-point trend.
+ * `better` is the direction of improvement, so progress-to-target colours right. */
+export type ScorecardMetric = {
+  label: string;
+  value: number;
+  target: number;
+  unit: string;
+  trend: number[];
+  better: "up" | "down";
+};
+
+export const transformationScorecard: ScorecardMetric[] = [
+  { label: "AI readiness", value: 38, target: 75, unit: "%", trend: [29, 31, 33, 35, 38], better: "up" },
+  { label: "Internal fill rate", value: 46, target: 70, unit: "%", trend: [38, 40, 42, 44, 46], better: "up" },
+  { label: "Time to fill", value: 64, target: 35, unit: "d", trend: [82, 78, 74, 69, 64], better: "down" },
+  { label: "Reskill throughput", value: 23, target: 60, unit: "/qtr", trend: [8, 12, 15, 19, 23], better: "up" },
+  { label: "Attrition risk", value: 11, target: 7, unit: "%", trend: [9, 10, 10, 11, 11], better: "down" },
+];
+
+/* ── Strategic program demand tracker ──────────────────────────────────────
+ * Named transformation programs, each declaring its skill demand and tracked
+ * to fulfilment: demand → committed supply → gap → agent fill plan → status. */
+export type ProgramStatus = "on-track" | "at-risk" | "blocked";
+
+export type TransformationProgram = {
+  id: string;
+  name: string;
+  sponsor: string;
+  skill: string;
+  demand: number;
+  supply: number;
+  reskill: number;
+  hire: number;
+  deadline: string;
+  status: ProgramStatus;
+  note: string;
+};
+
+export const transformationPrograms: TransformationProgram[] = [
+  {
+    id: "ai-studio",
+    name: "Enterprise AI Studio scale-up",
+    sponsor: "CTO Office",
+    skill: "AI Delivery + GenAI Eng",
+    demand: 24,
+    supply: 9,
+    reskill: 12,
+    hire: 3,
+    deadline: "Q3 FY26",
+    status: "at-risk",
+    note: "Priya Sharma tagged to 1 of 15 open delivery seats.",
+  },
+  {
+    id: "genai-coe",
+    name: "GenAI Centre of Excellence",
+    sponsor: "Chief AI Office",
+    skill: "GenAI Engineering",
+    demand: 18,
+    supply: 7,
+    reskill: 9,
+    hire: 2,
+    deadline: "Q4 FY26",
+    status: "at-risk",
+    note: "Reskill cohort forming; 9 candidates identified.",
+  },
+  {
+    id: "cyber-uplift",
+    name: "Cyber Uplift programme",
+    sponsor: "CISO",
+    skill: "Cybersecurity",
+    demand: 15,
+    supply: 6,
+    reskill: 4,
+    hire: 5,
+    deadline: "Q3 FY26",
+    status: "blocked",
+    note: "External hiring slow; internal reskill pool is thin.",
+  },
+  {
+    id: "cloud-modern",
+    name: "Cloud & Platform modernization",
+    sponsor: "Head of Platform",
+    skill: "Cloud & Platform",
+    demand: 14,
+    supply: 11,
+    reskill: 3,
+    hire: 0,
+    deadline: "Q2 FY26",
+    status: "on-track",
+    note: "Supply nearly covers demand; reskilling 3 from adjacent skills.",
+  },
+  {
+    id: "legacy-winddown",
+    name: "Legacy QA wind-down",
+    sponsor: "Delivery Ops",
+    skill: "Manual QA → Automation",
+    demand: 0,
+    supply: 20,
+    reskill: 20,
+    hire: 0,
+    deadline: "Q2 FY26",
+    status: "on-track",
+    note: "Redeploying 20 from cooling Legacy QA into Automation.",
+  },
+];
+
+/* ── Build-vs-buy portfolio ─────────────────────────────────────────────────
+ * Reskill vs external-hire economics across every critical role gap, with a
+ * portfolio total saving — the board-level ROI case. ₹ in crore. */
+export type BuildVsBuyRole = {
+  role: string;
+  gap: number;
+  reskillCr: number;
+  hireCr: number;
+  savingCr: number;
+  reskillDays: number;
+  hireDays: number;
+};
+
+export const buildVsBuy: BuildVsBuyRole[] = [
+  { role: "AI Delivery Manager", gap: 9, reskillCr: 2.3, hireCr: 16.2, savingCr: 13.9, reskillDays: 90, hireDays: 210 },
+  { role: "GenAI Engineer", gap: 11, reskillCr: 1.8, hireCr: 12.1, savingCr: 10.3, reskillDays: 120, hireDays: 180 },
+  { role: "Security Engineer", gap: 9, reskillCr: 1.5, hireCr: 9.9, savingCr: 8.4, reskillDays: 120, hireDays: 160 },
+  { role: "Cloud Engineer", gap: 3, reskillCr: 0.4, hireCr: 3.3, savingCr: 2.9, reskillDays: 90, hireDays: 150 },
+];
+
+export const buildVsBuyTotalSavingCr = buildVsBuy.reduce((s, r) => s + r.savingCr, 0);
+
 export const baseHrInsights: HrInsights = {
   hrPartner: "Anita Desai",
   hrPartnerTitle: "Chief People Officer",
