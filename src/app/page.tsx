@@ -53,8 +53,8 @@ const PERSONAS: PersonaCard[] = [
     scenario: "“How do I move into AI Delivery Management?”",
     does: "Career GPS maps a 90-day path, enrols her, and surfaces 3 internal roles — with an 84% success probability.",
     accent: "purple",
-    href: "/app?persona=priya&view=career",
-    cta: "Open Career GPS",
+    href: "/app?persona=priya",
+    cta: "Chat with Sakha",
   },
   {
     initial: "V",
@@ -211,7 +211,7 @@ export default function Home() {
 
         <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
           New here?{" "}
-          <Link href="/app?persona=priya&view=career" className="font-semibold text-[var(--ai-purple)] hover:underline">
+          <Link href="/app?persona=priya" className="font-semibold text-[var(--ai-purple)] hover:underline">
           Start with Priya&rsquo;s journey →
           </Link>{" "}
           · Runs with no API key, fully demo-safe.
@@ -315,7 +315,7 @@ export default function Home() {
               already in motion.
             </p>
             <Link
-              href="/app?persona=priya&view=career"
+              href="/app?persona=priya"
               className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white glow-purple"
               style={{ background: ACCENT_HEX.purple }}
             >
