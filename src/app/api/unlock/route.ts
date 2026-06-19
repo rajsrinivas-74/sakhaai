@@ -13,7 +13,9 @@ export async function POST(req: Request) {
   const expected = process.env.DEMO_PASSCODE ?? "";
 
   if (expected && passcode === expected) {
-    const res = NextResponse.redirect(new URL(next, req.url));
+    // 303 See Other → the browser follows with a GET (307 would re-POST to a
+    // page route and 405). Cookie still rides on the redirect response.
+    const res = NextResponse.redirect(new URL(next, req.url), 303);
     res.cookies.set(GATE_COOKIE, await gateToken(expected), {
       httpOnly: true,
       sameSite: "lax",
@@ -27,5 +29,5 @@ export async function POST(req: Request) {
   const back = new URL("/unlock", req.url);
   back.searchParams.set("error", "1");
   back.searchParams.set("next", next);
-  return NextResponse.redirect(back);
+  return NextResponse.redirect(back, 303);
 }
