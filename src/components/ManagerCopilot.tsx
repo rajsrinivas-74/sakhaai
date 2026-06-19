@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { READINESS_STATUS, managerData, type ReadinessMember } from "@/data/manager";
+import { personaById } from "@/data/personas";
 import { seedAgentEvents } from "@/data/agents";
 import { useOverlay } from "@/lib/useOverlay";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
@@ -61,7 +62,7 @@ export function ManagerCopilot() {
         setDraft({
           agent: "career",
           title: "AI Studio Pilot — Priya",
-          body: "Assigning Priya Sharma to the AI Studio Pilot — 89% ready for the AI Engineer track, 91% project match. — via Sakha",
+          body: "Assigning Priya Sharma to the AI Studio Pilot — 89% ready for the AI Delivery Manager track, 91% project match. — via Sakha",
           autonomy: "approval",
         }),
     },
@@ -151,7 +152,7 @@ export function ManagerCopilot() {
         />
 
         {/* TEAM READINESS MAP */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
               <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
@@ -182,7 +183,7 @@ export function ManagerCopilot() {
         </div>
 
         {/* TALENT PIPELINE */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
           <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
             <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
             AI talent pipeline
@@ -229,6 +230,10 @@ function ReadinessRow({ member }: { member: ReadinessMember }) {
 
 function EmployeeSpotlight({ onAct }: { onAct: (d: AgentDraft) => void }) {
   const s = managerData.spotlight;
+  const twin = personaById("priya");
+  const dims = twin.promotion?.dimensions ?? [];
+  const strength = dims.filter((d) => d.status === "exceeds").sort((a, b) => b.current - a.current)[0];
+  const gap = dims.filter((d) => d.status === "critical" || d.status === "development").sort((a, b) => a.current - b.current)[0];
   return (
     <div
       className="rounded-xl border p-5"
@@ -255,12 +260,44 @@ function EmployeeSpotlight({ onAct }: { onAct: (d: AgentDraft) => void }) {
           <span className="block text-[10px] text-[var(--text-muted)]">AI ready</span>
         </span>
       </div>
+
+      {/* PROMOTION READINESS — same KPP-grounded number Priya sees */}
+      {twin.promotion && (
+        <div className="mt-3 rounded-lg attr-card bg-[var(--bg)] p-3">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              Promotion readiness
+            </span>
+            <span className="font-bold tabular-nums text-[var(--ai-cyan)]">
+              {twin.promotion.overall}%
+              <span className="font-medium text-[var(--text-muted)]"> / {twin.promotion.target}%</span>
+            </span>
+          </div>
+          <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
+            <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${twin.promotion.overall}%`, background: ACCENT_HEX.cyan }} />
+            <div className="absolute inset-y-0 w-0.5" style={{ left: `${twin.promotion.target}%`, background: ACCENT_HEX.purple }} />
+          </div>
+          {(strength || gap) && (
+            <p className="mt-2 text-[11px] leading-4 text-[var(--text-secondary)]">
+              KPP evidence:{" "}
+              {strength && (
+                <span className="font-semibold text-[var(--ai-cyan)]">{strength.label} {strength.current}%</span>
+              )}
+              {strength && gap && " · "}
+              {gap && (
+                <span className="font-semibold text-[var(--ai-orange)]">{gap.label} {gap.current}%</span>
+              )}
+            </p>
+          )}
+        </div>
+      )}
+
       <button
         onClick={() =>
           onAct({
             agent: "career",
             title: "AI Studio Pilot — Priya",
-            body: `Assigning Priya Sharma to the AI Studio Pilot. She's ${s.readiness}% ready for the AI Engineer track and a 91% match for the project. Manager: Vikram. — via Sakha`,
+              body: `Assigning Priya Sharma to the AI Studio Pilot. She's ${s.readiness}% ready for the AI Delivery Manager track and a 91% match for the project. Manager: Vikram. — via Sakha`,
             autonomy: "approval",
           })
         }
@@ -277,7 +314,7 @@ function EmployeeSpotlight({ onAct }: { onAct: (d: AgentDraft) => void }) {
 function RiskCenter({ onAct, flags }: { onAct: (d: AgentDraft) => void; flags: string[] }) {
   const priyaFlagged = flags.includes("priya");
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
       <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
         <CircleAlert className="h-4 w-4 text-[var(--ai-pink)]" />
         Risk center · top 3
@@ -291,7 +328,7 @@ function RiskCenter({ onAct, flags }: { onAct: (d: AgentDraft) => void; flags: s
               onAct({
                 agent: "wellbeing",
                 title: "Growth 1:1 — Priya",
-                body: "Hi Priya, do you have 30 minutes this week? I'd love to hear how things are going and talk through your AI Engineer path — there are a couple of internal roles I think you'd be great for. Pick any slot. — Vikram",
+                body: "Hi Priya, do you have 30 minutes this week? I'd love to hear how things are going and talk through your AI Delivery Manager path — there are a couple of internal roles I think you'd be great for. Pick any slot. — Vikram",
                 autonomy: "approval",
               })
             }

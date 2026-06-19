@@ -28,7 +28,7 @@ export function managerResponder(q: string): AskAnswer {
     return {
       text: "3 team members are promotion-ready this cycle.",
       matches: [
-        { label: "Priya Sharma", sub: "AI path on track", score: 88 },
+        { label: "Priya Sharma", sub: "AI delivery path on track", score: 88 },
         { label: "Arjun Mehta", sub: "Fast ramp from onboarding", score: 71 },
         { label: "Kiran Bose", sub: "Scrum leadership", score: 67 },
       ],
@@ -37,7 +37,7 @@ export function managerResponder(q: string): AskAnswer {
   return {
     text: "I found 5 candidates who can support the new AI project. Best matches:",
     matches: [
-      { label: "Priya Sharma", sub: "Learning path complete · AI cert underway", score: 91 },
+      { label: "Priya Sharma", sub: "Delivery base + AI delivery path underway", score: 91 },
       { label: "Arjun Mehta", sub: "Full-stack + AI-curious", score: 84 },
       { label: "Kiran Bose", sub: "Cloud foundation", score: 76 },
     ],

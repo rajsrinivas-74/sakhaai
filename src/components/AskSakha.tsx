@@ -44,7 +44,7 @@ export function AskSakha({
   }
 
   return (
-    <div className={flat ? "" : "rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5"}>
+    <div className={flat ? "" : "rounded-xl attr-card bg-[var(--bg)] p-5"}>
       {!flat && (
         <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
           <Sparkles className="h-4 w-4 text-[var(--ai-cyan)]" />
@@ -99,7 +99,7 @@ export function AskSakha({
                 {answer.matches.map((m) => (
                   <div
                     key={m.label}
-                    className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2"
+                    className="flex items-center justify-between rounded-lg attr-card bg-[var(--bg)] px-3 py-2"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-[var(--text-primary)]">{m.label}</p>

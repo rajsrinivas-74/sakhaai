@@ -25,14 +25,31 @@ const StepsSchema = z.object({
 type Step = { agent: AgentId; text: string };
 
 function fallbackSteps(e: EmployeeTwin, goal: string): Step[] {
-  return [
+  const steps: Step[] = [
     { agent: "career", text: `Reading ${e.name}'s Digital Twin — ${e.skills.length} skills, ${e.certifications.length} certs on file` },
+  ];
+  if (e.kpps?.length) {
+    const miss = e.kpps.find((k) => k.status === "behind");
+    steps.push({
+      agent: "career",
+      text: miss
+        ? `Reading KPP record — ${miss.name} ${miss.achievement}/${miss.target} flags a real gap`
+        : `Reading KPP performance record to ground the gap analysis`,
+    });
+  }
+  if (e.managerFeedback) {
+    steps.push({
+      agent: "career",
+      text: `Factoring ${e.managerFeedback.from}'s feedback — ${e.managerFeedback.developmentAreas[0]}`,
+    });
+  }
+  steps.push(
     { agent: "career", text: `Comparing current profile against the ${goal} role across 200+ definitions` },
-    { agent: "career", text: `Isolating priority gaps — ${e.skills.slice(0, 2).join(", ")} transfer; new depth needed` },
     { agent: "workforce", text: `Checking ${goal} demand vs supply across the org` },
     { agent: "opportunity", text: `Scanning open internal roles for the strongest matches` },
     { agent: "learning", text: `Sequencing courses and calendar into a ${Math.max(1, Math.round((e.daysAtCompany % 90) / 30) + 2)}-month plan` },
-  ];
+  );
+  return steps;
 }
 
 async function modelSteps(e: EmployeeTwin, goal: string): Promise<Step[] | null> {
@@ -51,8 +68,18 @@ async function modelSteps(e: EmployeeTwin, goal: string): Promise<Step[] | null>
         },
         {
           role: "user",
-          content: `Employee: ${e.name}, ${e.role}. Skills: ${e.skills.join(", ")}. Goal: ${goal}.
-Return JSON {"steps":[{"agent":"career|learning|opportunity|workforce","text":"<reasoning step, max 14 words>"}]} with 5-6 steps showing how the fleet reasons from current skills to the goal, in order.`,
+          content: `Employee: ${e.name}, ${e.role}. Skills: ${e.skills.join(", ")}. Goal: ${goal}.${
+            e.kpps?.length
+              ? `\nKPP performance: ${e.kpps
+                  .map((k) => `${k.name} ${k.achievement}/${k.target} (${k.score}/10)`)
+                  .join("; ")}.`
+              : ""
+          }${
+            e.managerFeedback
+              ? `\nManager (${e.managerFeedback.from}) flagged development areas: ${e.managerFeedback.developmentAreas.join(", ")}.`
+              : ""
+          }
+Return JSON {"steps":[{"agent":"career|learning|opportunity|workforce","text":"<reasoning step, max 14 words>"}]} with 5-6 steps showing how the fleet reasons from current skills to the goal, in order. If KPP performance or manager feedback is given, have the career agent explicitly reference it when isolating gaps.`,
         },
       ],
     });

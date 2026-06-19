@@ -51,28 +51,28 @@ export const workforceSignals: WorkforceSignal[] = [
 export const hrActions: HrAction[] = [
   {
     id: "hr-priya-crosstrain",
-    title: "Approve AI cross-training for Priya Sharma",
+    title: "Approve AI delivery cross-training for Priya Sharma",
     rationale:
-      "42% → AI Engineer match with a strong Java/cloud base. Closes a critical-demand gap at internal-mobility cost, not hire cost.",
+      "38% → AI Delivery Manager match with a strong delivery and revenue base. Closes a critical-demand gap at internal-mobility cost, not hire cost.",
     about: "priya",
     impact: "reskilling",
     verb: "Approve",
     draftTitle: "Cross-training approval — Priya",
     draft:
-      "Approving Priya Sharma (EMP-51626927) for the 86-day AI Engineer reskilling track. Funding from the GenAI capability budget. Manager Vikram aligned. Target role: Associate AI Engineer, Enterprise AI Studio. — via Sakha",
+      "Approving Priya Sharma (EMP-51626927) for the 90-day AI Delivery Manager reskilling track. Funding from the GenAI capability budget. Manager Vikram aligned. Target role: Associate AI Delivery Manager, AI Studio Pilot. — via Sakha",
     accent: "purple",
   },
   {
     id: "hr-priya-mobility",
-    title: "Align Priya to the Enterprise AI Studio pipeline",
+    title: "Align Priya to the AI Studio Pilot pipeline",
     rationale:
-      "Associate AI Engineer is an 82% match and an open critical role. Pre-tagging her shortens the fill once she's ready.",
+      "Associate AI Delivery Manager is an 89% match and an open critical role. Pre-tagging her shortens the fill once she's ready.",
     about: "priya",
     impact: "mobility",
     verb: "Align",
     draftTitle: "Talent pipeline — Priya",
     draft:
-      "Tagging Priya Sharma to the Enterprise AI Studio talent pipeline for Associate AI Engineer (ready in ~86 days). Notifying the studio's hiring lead to hold a slot. — via Sakha",
+      "Tagging Priya Sharma to the AI Studio Pilot talent pipeline for Associate AI Delivery Manager (ready in ~90 days). Notifying the studio's hiring lead to hold a slot. — via Sakha",
     accent: "blue",
   },
   {
@@ -93,13 +93,30 @@ export const hrActions: HrAction[] = [
 /** Role-level demand vs supply (headcounts) — the hero gap story. */
 export const roleGaps = [
   { role: "AI Engineers", demand: 92, supply: 38 },
+  { role: "AI Delivery Managers", demand: 12, supply: 3 },
   { role: "AI Consultants", demand: 56, supply: 21 },
   { role: "Data Engineers", demand: 41, supply: 35 },
 ];
 
+/**
+ * Reskilling economics for the AI Delivery Manager cohort — the build-vs-buy
+ * case Anita approves. 23 delivery managers share Priya's profile (revenue
+ * strong, commercial gap, no AI experience yet).
+ */
+export const reskillEconomics = {
+  cohortSize: 23,
+  supplyToday: 3,
+  supplyAfter180: 19,
+  reskillCostCr: 2.3,
+  externalHireCostCr: 16.2,
+  savingCr: 13.9,
+  reskilledTimeToProductivityDays: 90,
+  externalHireTimeToProductivityDays: 210,
+};
+
 /** Talent Sakha *discovered* (not who applied). */
 export const talentDiscovery = [
-  { name: "Priya Sharma", initial: "P", match: 89, reason: "Java + cloud base, AI path underway" },
+  { name: "Priya Sharma", initial: "P", match: 89, reason: "Delivery + commercial base, AI delivery path underway" },
   { name: "Arjun Mehta", initial: "A", match: 84, reason: "Fast learner, AI-curious" },
   { name: "Sneha Iyer", initial: "S", match: 82, reason: "Strong fundamentals, mentors others" },
 ];
@@ -121,6 +138,7 @@ export const retentionIntel = {
 
 export const baseHrInsights: HrInsights = {
   hrPartner: "Anita Desai",
+  hrPartnerTitle: "Chief People Officer",
   asOf: "Week of June 20, 2026",
   aiReadiness: 38,
   attritionRiskPct: 11,

@@ -39,7 +39,7 @@ export function ManagerWhatIf() {
         {METRICS.map((m) => {
           const Icon = m.dir === "up" ? TrendingUp : TrendingDown;
           return (
-            <div key={m.label} className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 text-center">
+            <div key={m.label} className="rounded-lg attr-card bg-[var(--bg)] p-3 text-center">
               <p className="text-[10px] uppercase tracking-wide text-[var(--text-muted)]">{m.label}</p>
               <div className="mt-1 flex items-center justify-center gap-1.5">
                 <motion.span

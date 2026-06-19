@@ -129,7 +129,7 @@ function TimelineRow({ event }: { event: AgentEvent }) {
       layout
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
-      className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-2.5"
+      className="rounded-lg attr-card bg-[var(--bg)] p-2.5"
     >
       <div className="flex items-center gap-2">
         <span className="text-[10px] tabular-nums text-[var(--text-muted)]">{event.time}</span>

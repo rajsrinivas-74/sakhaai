@@ -166,7 +166,7 @@ export function WorkforceSimulator() {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.25 }}
-                className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2"
+                className="flex items-center gap-2 rounded-lg attr-card bg-[var(--bg)] px-3 py-2"
               >
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[var(--ai-cyan)]" />
                 <span
@@ -216,7 +216,7 @@ function Output({
   accent: "blue" | "purple" | "cyan";
 }) {
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-2.5 text-center">
+    <div className="rounded-lg attr-card bg-[var(--bg)] p-2.5 text-center">
       <Icon className="mx-auto h-4 w-4" style={{ color: ACCENT_HEX[accent] }} />
       <p className="mt-1 text-base font-bold text-[var(--text-primary)] tabular-nums">{value}</p>
       <p className="text-[10px] leading-3 text-[var(--text-muted)]">{label}</p>

@@ -78,7 +78,8 @@ export function DigitalTwin({
         <div className="min-w-0">
           <p className="text-lg font-semibold text-[var(--text-primary)]">{twin.fullName}</p>
           <p className="text-xs text-[var(--text-secondary)]">
-            {twin.role} · {twin.location}
+            {twin.role}
+            {twin.level ? ` · ${twin.level}` : ""} · {twin.location}
           </p>
         </div>
       </div>
@@ -129,7 +130,34 @@ export function DigitalTwin({
         />
       </div>
 
-      <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3">
+      {twin.promotion && (
+        <div className="mt-4 rounded-lg attr-card bg-[var(--bg)] p-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+              Promotion readiness
+            </p>
+            <span className="text-xs font-bold tabular-nums text-[var(--ai-cyan)]">
+              {twin.promotion.overall}%
+              <span className="font-medium text-[var(--text-muted)]"> / {twin.promotion.target}%</span>
+            </span>
+          </div>
+          <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{ width: `${twin.promotion.overall}%`, background: ACCENT_HEX.cyan }}
+            />
+            <div
+              className="absolute inset-y-0 w-0.5"
+              style={{ left: `${twin.promotion.target}%`, background: ACCENT_HEX.purple }}
+            />
+          </div>
+          <p className="mt-1.5 text-[10px] text-[var(--text-muted)]">
+            Target {twin.promotion.target}% in {twin.promotion.targetWindowDays} days
+          </p>
+        </div>
+      )}
+
+      <div className="mt-4 rounded-lg attr-card bg-[var(--bg)] p-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
           Last kudos
         </p>

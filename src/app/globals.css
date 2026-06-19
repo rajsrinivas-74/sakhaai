@@ -12,6 +12,8 @@
   --card: #0b1220;
   --card-hover: #0f172a;
   --border: #1e293b;
+  /* Stronger boundary for grouping a "set of attributes" into a clear card */
+  --border-strong: #3a4d70;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -84,6 +86,15 @@ textarea {
 }
 .surface-hover:hover {
   background: var(--card-hover);
+}
+
+/* Bold, clearly-bounded card for each grouped set of attributes. Replaces the
+   faint 1px border so dense persona screens read as distinct, scannable blocks. */
+.attr-card {
+  border: 1.5px solid var(--border-strong);
+}
+.attr-card.surface-hover:hover {
+  border-color: color-mix(in srgb, var(--border-strong) 75%, white 25%);
 }
 
 /* Header underline / active nav — the ONLY sanctioned gradient use */

@@ -48,10 +48,10 @@ const PERSONAS: PersonaCard[] = [
     initial: "P",
     name: "Priya",
     persona: "Employee",
-    role: "Java Developer → AI Engineer",
+    role: "Delivery Manager → AI Delivery Manager",
     tag: "Lateral hire · Month 3",
-    scenario: "“How do I become an AI Engineer?”",
-    does: "Career GPS maps an 86-day path, enrols her, and surfaces 3 internal roles — with an 88% success probability.",
+    scenario: "“How do I move into AI Delivery Management?”",
+    does: "Career GPS maps a 90-day path, enrols her, and surfaces 3 internal roles — with an 84% success probability.",
     accent: "purple",
     href: "/app?persona=priya&view=career",
     cta: "Open Career GPS",
@@ -212,7 +212,7 @@ export default function Home() {
         <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
           New here?{" "}
           <Link href="/app?persona=priya&view=career" className="font-semibold text-[var(--ai-purple)] hover:underline">
-            Start with Priya&rsquo;s journey →
+          Start with Priya&rsquo;s journey →
           </Link>{" "}
           · Runs with no API key, fully demo-safe.
         </p>
@@ -311,7 +311,7 @@ export default function Home() {
               See Sakha answer the one question every employee asks.
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-[var(--text-secondary)]">
-              “What should I do next in my career?” — answered live, in seconds, with the path
+              “How do I move into AI Delivery Management?” — answered live, in seconds, with the path
               already in motion.
             </p>
             <Link

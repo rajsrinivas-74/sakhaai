@@ -16,10 +16,10 @@ function greeting(twin: EmployeeTwin): ChatMessage {
     priya: {
       id: nextId(),
       role: "sakha",
-      text: "Good morning, Priya. Project Helix access is ready and your Azure cert is on record. I noticed your AI Engineer goal from the last check-in — want me to map your path?",
+      text: "Good morning, Priya. Your delivery portfolio is ready and your AI-900 cert is on record. I noticed your AI Delivery Manager goal from the last check-in — want me to map your path?",
       time: "09:02",
       quickReplies: [
-        "I've been in the same role for 4 years. I want to move into AI. What should I do next?",
+        "I've been in the same role for 4 years. I want to move into AI delivery. What should I do next?",
         "What role should I target next?",
       ],
     },
@@ -162,7 +162,7 @@ export function SakhaChat({
       </div>
 
       <div className="border-t border-[var(--border)] p-4">
-        <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2">
+        <div className="flex items-center gap-2 rounded-xl attr-card bg-[var(--bg)] px-3 py-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -238,7 +238,7 @@ function Bubble({
 function CardView({ card, onSelectRole }: { card: ChatCard; onSelectRole: (goal: string) => void }) {
   if (card.type === "matches") {
     return (
-      <div className="mt-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
+      <div className="mt-2 rounded-xl attr-card bg-[var(--bg)] p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
             <Target className="h-4 w-4 text-[var(--ai-purple)]" />
@@ -278,7 +278,7 @@ function CardView({ card, onSelectRole }: { card: ChatCard; onSelectRole: (goal:
 
   const autonomy: AutonomyLevel = card.type === "ticket" ? "auto" : "approval";
   return (
-    <div className="mt-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
+    <div className="mt-2 rounded-xl attr-card bg-[var(--bg)] p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
           {card.type === "ticket" ? (

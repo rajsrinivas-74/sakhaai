@@ -207,7 +207,7 @@ function TwinTick({
   const newSkillVisible = active >= 3; // after "Enrolled in Python for AI"
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-4">
       <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
         <Sparkles className="h-3.5 w-3.5 text-[var(--ai-cyan)]" />
         Digital Twin · updating live

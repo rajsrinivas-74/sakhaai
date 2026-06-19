@@ -7,8 +7,8 @@ export const proactiveNotifications: Record<PersonaId, ProactiveNotification> = 
     tone: "welcome",
     title: "Good morning, Priya",
     message:
-      "Project Helix access is ready and your Azure cert is on record. You mentioned wanting to grow into AI Engineering — want me to map your path?",
-    actions: [{ label: "Map my AI Engineer path" }, { label: "Not now" }],
+      "Your delivery portfolio is ready and your AI-900 cert is on record. You mentioned wanting to grow into AI Delivery Management — want me to map your path?",
+    actions: [{ label: "Map my AI Delivery path" }, { label: "Not now" }],
   },
   arjun: {
     persona: "arjun",

@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Compass, Leaf, ListChecks } from "lucide-react";
-import type { AgentId, CareerGpsResult, EmployeeTwin } from "@/types/sakha";
+import type {
+  AgentId,
+  CareerGpsResult,
+  EmployeeTwin,
+  ProactiveNotification as NotifType,
+} from "@/types/sakha";
 import { ACCENT_HEX, accentRgba } from "@/lib/accents";
 import { AgentChip } from "@/components/AgentChip";
 import { MissionControl } from "@/components/MissionControl";
@@ -26,13 +31,7 @@ export function CareerGps({
   twin: EmployeeTwin;
   prefillGoal?: string | null;
   onResult: (result: CareerGpsResult) => void;
-  notif?: {
-    title: string;
-    time: string;
-    message: string;
-    tone: "welcome" | "urgent" | "gentle";
-    actions: { label: string }[];
-  } | null;
+  notif?: NotifType | null;
   onNotifAction?: (label: string) => void;
   onNotifDismiss?: () => void;
 }) {
@@ -174,7 +173,7 @@ export function CareerGps({
                     onChange={(e) => setGoal(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && run(goal)}
                     placeholder="e.g. AI Engineer"
-                    className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--ai-purple)]"
+                    className="flex-1 rounded-xl attr-card bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--ai-purple)]"
                   />
                   <button
                     onClick={() => run(goal)}
@@ -191,7 +190,7 @@ export function CareerGps({
                     <button
                       key={g}
                       onClick={() => setGoal(g)}
-                      className="surface-hover rounded-full border border-[var(--border)] bg-[var(--bg)] px-3 py-1 text-xs text-[var(--text-secondary)]"
+                      className="surface-hover rounded-full attr-card bg-[var(--bg)] px-3 py-1 text-xs text-[var(--text-secondary)]"
                     >
                       {g}
                     </button>
@@ -200,7 +199,7 @@ export function CareerGps({
               </div>
 
               {/* Current skills on file */}
-              <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+              <div className="mt-4 rounded-xl attr-card bg-[var(--bg)] p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
                   Current skills on file
                 </p>
@@ -246,7 +245,7 @@ export function CareerGps({
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 320, damping: 28 }}
-                    className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3"
+                    className="flex items-center gap-3 rounded-lg attr-card bg-[var(--bg)] p-3"
                   >
                     <AgentChip agent={step.agent} status={i === reasoning.length - 1 ? "thinking" : "done"} />
                     <p className="min-w-0 flex-1 text-xs leading-5 text-[var(--text-secondary)]">{step.text}</p>

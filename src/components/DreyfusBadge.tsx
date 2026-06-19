@@ -17,7 +17,7 @@ export function DreyfusBadge({
 }) {
   const idx = DREYFUS_ORDER.indexOf(level);
   return (
-    <div className={compact ? "" : "mt-4 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3"}>
+    <div className={compact ? "" : "mt-4 rounded-lg attr-card bg-[var(--bg)] p-3"}>
       <div className="flex items-center justify-between">
         <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
           <GraduationCap className="h-3.5 w-3.5 text-[var(--ai-purple)]" />

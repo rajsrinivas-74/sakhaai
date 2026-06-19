@@ -42,18 +42,41 @@ const ResultSchema = z.object({
 });
 
 function buildPrompt(employee: EmployeeTwin, goal: string): string {
+  const kppBlock = employee.kpps?.length
+    ? `\nPerformance record (KPP appraisal — target vs achievement, score /10):\n${employee.kpps
+        .map(
+          (k) =>
+            `- ${k.name} (${k.category}, ${k.weight}% weight): ${k.achievement} vs ${k.target} target · ${k.score}/10 — ${k.signal}`,
+        )
+        .join("\n")}${employee.overallRating ? `\n- Overall rating: ${employee.overallRating}` : ""}`
+    : "";
+
+  const promoBlock = employee.promotion
+    ? `\nPromotion readiness: ${employee.promotion.overall}% today, target ${employee.promotion.target}% in ${employee.promotion.targetWindowDays} days.\n${employee.promotion.dimensions
+        .map((d) => `- ${d.label}: ${d.current}% (${d.status})`)
+        .join("\n")}`
+    : "";
+
+  const mgrBlock = employee.managerFeedback
+    ? `\nManager feedback (${employee.managerFeedback.from}, ${employee.managerFeedback.date} · ${employee.managerFeedback.sentiment}):\n"${employee.managerFeedback.summary}"\n- Strengths: ${employee.managerFeedback.strengths.join("; ")}\n- Development areas: ${employee.managerFeedback.developmentAreas.join("; ")}`
+    : "";
+
   return `You are Sakha's Career GPS engine for HCLTech.
 
 Employee Digital Twin:
 - Name: ${employee.name}
-- Current role: ${employee.role}
+- Current role: ${employee.role}${employee.level ? ` (${employee.level})` : ""}
 - Current skills: ${employee.skills.join(", ")}
 - Certifications: ${employee.certifications.join(", ") || "none"}
 - Years experience: ${employee.yearsExp}
 - Current project: ${employee.currentProject ?? "none"}
-- Career goal: ${goal}
+- Career goal: ${goal}${kppBlock}${promoBlock}${mgrBlock}
 
 Analyse the skill gap from this employee's CURRENT skills toward the goal "${goal}".
+Ground your reasoning in the EVIDENCE above: use the KPP performance record and the
+manager feedback to justify which gaps are real. Where a KPP missed its target or the
+manager flagged a development area, prioritise the matching skill and reference the
+evidence in the milestone or course. Do NOT recommend generic gaps the evidence doesn't support.
 Return ONLY valid JSON in exactly this shape (no markdown, no commentary):
 {
   "matchPercentage": <number 0-100, readiness today>,

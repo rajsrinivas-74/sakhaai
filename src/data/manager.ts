@@ -66,6 +66,8 @@ export const READINESS_STATUS: Record<ReadinessStatus, { label: string; accent: 
 
 export const managerData = {
   manager: "Vikram Nair",
+  managerTitle: "Senior Delivery Director",
+  managerLevel: "E5",
   weekEnding: "June 20, 2026",
   teamHealthScore: 84,
   teamHealthTrend: [89, 91, 88, 86, 84],
@@ -77,7 +79,7 @@ export const managerData = {
   readinessProject: "AI Transformation Project",
   projectReadiness: 82,
   readinessTeam: [
-    { name: "Priya Sharma", initial: "P", status: "ready-soon", note: "AI path · 89% ready" },
+    { name: "Priya Sharma", initial: "P", status: "ready-soon", note: "AI delivery path · 89% ready" },
     { name: "Arjun Mehta", initial: "A", status: "ready", note: "Full-stack, AI-curious" },
     { name: "Rajan Krishnan", initial: "R", status: "risk", note: "Burnout · 8 late nights" },
     { name: "Meera Kumar", initial: "M", status: "gap", note: "Needs GenAI fundamentals" },
@@ -90,9 +92,11 @@ export const managerData = {
   spotlight: {
     name: "Priya Sharma",
     initial: "P",
-    role: "Java Full Stack Developer",
-    goal: "AI Engineer",
+    role: "Delivery Manager",
+    goal: "AI Delivery Manager",
     readiness: 89,
+    promotionReadiness: 52,
+    promotionTarget: 75,
     suggestedAction: "Assign to AI Studio Pilot",
   },
 

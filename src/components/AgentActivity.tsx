@@ -39,7 +39,7 @@ export function AgentActivity({
   const visible = ordered.slice(0, shown);
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
           <Cpu className="h-4 w-4 text-[var(--ai-cyan)]" />

@@ -56,7 +56,7 @@ export function AgentDraftPanel({ draft, onClose }: { draft: AgentDraft; onClose
           <p className="mt-1 text-[11px] text-[var(--text-muted)]">
             Drafted by <span style={{ color: ACCENT_HEX[accent] }}>{def.name}</span>
           </p>
-          <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 text-xs leading-5 text-[var(--text-secondary)]">
+          <div className="mt-3 rounded-lg attr-card bg-[var(--bg)] p-3 text-xs leading-5 text-[var(--text-secondary)]">
             {draft.body}
           </div>
           <div className="mt-3">

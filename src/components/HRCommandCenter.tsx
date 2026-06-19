@@ -22,6 +22,7 @@ import {
   talentDiscovery,
   workforceForecast,
   retentionIntel,
+  reskillEconomics,
 } from "@/data/workforce";
 import { seedAgentEvents } from "@/data/agents";
 import { personaById } from "@/data/personas";
@@ -115,7 +116,9 @@ export function HRCommandCenter({
           </span>
           <div>
             <h2 className="text-base font-semibold text-[var(--text-primary)]">{insights.hrPartner}</h2>
-            <p className="text-xs text-[var(--text-secondary)]">Capability Manager · Workforce Transformation</p>
+            <p className="text-xs text-[var(--text-secondary)]">
+              {insights.hrPartnerTitle ?? "Capability Manager"} · Workforce Transformation
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -192,7 +195,7 @@ export function HRCommandCenter({
 
         {/* ROLE-LEVEL GAP MAP + AGENT ACTIVITY */}
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
                 <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
@@ -213,8 +216,11 @@ export function HRCommandCenter({
           <AgentActivity events={liveEvents} title="Agent activity" compact />
         </div>
 
+        {/* AI DELIVERY MANAGER — build vs buy (Priya's cohort) */}
+        <AiDeliveryManagerCase onAct={setDraft} />
+
         {/* WORKFORCE SIGNALS */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
           <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
             <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
             Workforce signals
@@ -253,7 +259,7 @@ export function HRCommandCenter({
 
         {/* TALENT DISCOVERY + FUTURE WORKFORCE */}
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
               <Radar className="h-4 w-4 text-[var(--ai-orange)]" />
               Talent discovery
@@ -278,7 +284,7 @@ export function HRCommandCenter({
             </div>
           </div>
 
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
               <TrendingUp className="h-4 w-4 text-[var(--ai-cyan)]" />
               Future workforce · AI-ready
@@ -308,6 +314,59 @@ export function HRCommandCenter({
       </div>
 
       <AgentDraftPanel draft={draft} onClose={() => setDraft(null)} />
+    </div>
+  );
+}
+
+function AiDeliveryManagerCase({ onAct }: { onAct: (d: AgentDraft) => void }) {
+  const e = reskillEconomics;
+  return (
+    <div
+      className="rounded-xl border p-5"
+      style={{ borderColor: accentRgba("purple", 0.4), background: accentRgba("purple", 0.05) }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+          <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
+          AI Delivery Manager · build vs buy
+        </div>
+        <AgentChip agent="workforce" status="thinking" />
+      </div>
+      <p className="mt-1 text-xs text-[var(--text-secondary)]">
+        Priya&rsquo;s move surfaced <span className="font-semibold text-[var(--text-primary)]">{e.cohortSize} delivery managers</span> with the same
+        profile — revenue-strong, commercial gap, no AI experience yet.
+      </p>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <CaseStat label="Supply today" value={String(e.supplyToday)} accent="pink" />
+        <CaseStat label="Supply in 180d" value={String(e.supplyAfter180)} accent="cyan" />
+        <CaseStat label="Reskill cost" value={`₹${e.reskillCostCr} Cr`} accent="blue" />
+        <CaseStat label="Saving vs hiring" value={`₹${e.savingCr} Cr`} accent="purple" />
+      </div>
+
+      <button
+        onClick={() =>
+          onAct({
+            agent: "workforce",
+            title: "AI Delivery Manager reskilling cohort",
+            body: `Launching the AI Delivery Manager reskilling cohort — ${e.cohortSize} delivery managers matching Priya Sharma's profile, Career GPS auto-enrolled. Supply ${e.supplyToday} → ${e.supplyAfter180} in 180 days. Investment ₹${e.reskillCostCr} Cr vs ₹${e.externalHireCostCr} Cr to hire externally (saving ₹${e.savingCr} Cr). — via Sakha`,
+            autonomy: "approval",
+          })
+        }
+        className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+        style={{ background: ACCENT_HEX.purple }}
+      >
+        Launch reskilling cohort · {e.cohortSize} candidates
+      </button>
+    </div>
+  );
+}
+
+function CaseStat({ label, value, accent }: { label: string; value: string; accent: Accent }) {
+  return (
+    <div className="rounded-lg attr-card bg-[var(--bg)] p-3 text-center">
+      <p className="text-lg font-bold tabular-nums" style={{ color: ACCENT_HEX[accent] }}>{value}</p>
+      <p className="mt-0.5 text-[10px] leading-3 text-[var(--text-muted)]">{label}</p>
     </div>
   );
 }

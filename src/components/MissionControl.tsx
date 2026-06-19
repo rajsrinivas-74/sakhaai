@@ -8,18 +8,24 @@ import {
   CheckCircle2,
   Gauge,
   MapPin,
+  MessageSquareQuote,
   Radar,
   Rocket,
   ShieldCheck,
   Target,
+  ThumbsUp,
+  TrendingUp,
   UserRound,
   Zap,
 } from "lucide-react";
-import type { AgentEvent, CareerGpsResult, EmployeeTwin, Mission } from "@/types/sakha";
+import type { AgentEvent, CareerGpsResult, EmployeeTwin, ManagerFeedback, Mission } from "@/types/sakha";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 import { DreyfusBadge } from "@/components/DreyfusBadge";
 import { ActionConsole } from "@/components/ActionConsole";
 import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
+import { KppScorecard } from "@/components/KppScorecard";
+import { PromotionReadiness } from "@/components/PromotionReadiness";
+import { SelfAssessment } from "@/components/SelfAssessment";
 import { useHeartbeat } from "@/lib/useHeartbeat";
 
 type RouteKey = "fastest" | "lowest" | "highest";
@@ -50,6 +56,7 @@ export function MissionControl({
         };
 
   const [route, setRoute] = useState<RouteKey>("fastest");
+  const [targetRole, setTargetRole] = useState(result.openRoles[0]?.title ?? "");
   const [hours, setHours] = useState(result.missingSkills[0]?.estimatedHoursPerWeek ?? 5);
   const [autopilot, setAutopilot] = useState(false);
   const [engaging, setEngaging] = useState(false);
@@ -202,6 +209,63 @@ export function MissionControl({
         </section>
       )}
 
+      {/* PERFORMANCE-GROUNDED — promotion readiness + KPP evidence + self-assessment */}
+      {(twin.promotion || twin.kpps || twin.selfAssessment) && (
+        <section className="space-y-4">
+          <SectionTitle icon={Gauge}>Grounded in your performance</SectionTitle>
+          <p className="-mt-2 text-[11px] text-[var(--text-muted)]">
+            Career GPS reads {twin.name}&rsquo;s actual KPP record — not a generic skills matrix.
+          </p>
+          <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+            {twin.promotion && <PromotionReadiness data={twin.promotion} />}
+            {twin.kpps && <KppScorecard kpps={twin.kpps} rating={twin.overallRating} />}
+          </div>
+          {twin.managerFeedback && <ManagerFeedbackCard fb={twin.managerFeedback} />}
+          {twin.selfAssessment && (
+            <SelfAssessment sections={twin.selfAssessment} name={twin.name} />
+          )}
+        </section>
+      )}
+
+      {/* TARGET ROLE SELECTION — the roles matching Priya's mission */}
+      <section>
+        <SectionTitle icon={Target}>Target role · internal matches</SectionTitle>
+        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          {result.openRoles.map((r) => {
+            const selected = targetRole === r.title;
+            return (
+              <button
+                key={r.title}
+                onClick={() => setTargetRole(r.title)}
+                className="rounded-xl border p-3 text-left transition"
+                style={{
+                  borderColor: selected ? ACCENT_HEX.purple : "var(--border-strong)",
+                  background: selected ? accentRgba("purple", 0.1) : "var(--bg)",
+                }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{r.title}</p>
+                  {selected && <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--ai-purple)]" />}
+                </div>
+                <p className="mt-0.5 text-[11px] text-[var(--text-secondary)]">{r.team}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="h-1.5 flex-1 rounded-full bg-[var(--border)]">
+                    <div className="h-1.5 rounded-full" style={{ width: `${r.match}%`, background: ACCENT_HEX.cyan }} />
+                  </div>
+                  <span className="text-xs font-bold text-[var(--ai-cyan)]">{r.match}%</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {targetRole && (
+          <p className="mt-2 text-[11px] text-[var(--text-muted)]">
+            Targeting <span className="font-semibold text-[var(--text-primary)]">{targetRole}</span> — Autopilot
+            aligns your plan to this role.
+          </p>
+        )}
+      </section>
+
       {/* ROUTE OPTIONS + WHAT-IF */}
       <div className="grid gap-4 xl:grid-cols-2">
         <RouteOptions selected={route} onSelect={setRoute} baseDays={result.readinessDays} />
@@ -217,7 +281,7 @@ export function MissionControl({
 function StatusChip({ autopilot, lastAction }: { autopilot: boolean; lastAction: number }) {
   if (!autopilot)
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--bg)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)]">
+      <span className="inline-flex items-center gap-1.5 rounded-full attr-card bg-[var(--bg)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)]">
         <span className="h-2 w-2 rounded-full" style={{ background: ACCENT_HEX.cyan }} />
         On Track
       </span>
@@ -248,7 +312,7 @@ function Cell({
   accent: Accent;
 }) {
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3">
+    <div className="rounded-lg attr-card bg-[var(--bg)] p-3">
       <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
         <Icon className="h-3.5 w-3.5" style={{ color: ACCENT_HEX[accent] }} />
         {label}
@@ -268,7 +332,7 @@ function CareerTwin({
   readiness: number;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-4">
       <SectionTitle icon={UserRound}>Career Twin · today → future you</SectionTitle>
       <div className="mt-2 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -311,7 +375,7 @@ function CareerHealthCard({ health }: { health: NonNullable<EmployeeTwin["career
     { label: "Promotion readiness", value: health.promotionReadiness },
   ];
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3">
+    <div className="rounded-lg attr-card bg-[var(--bg)] p-3">
       <div className="flex items-center justify-between">
         <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
           <Gauge className="h-3.5 w-3.5 text-[var(--ai-cyan)]" />
@@ -346,7 +410,7 @@ function RouteOptions({
     { key: "highest", label: "Highest success", steps: "Cert → Mentor → Project", eta: baseDays + 14 },
   ];
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-4">
       <SectionTitle icon={MapPin}>Route optimization</SectionTitle>
       <div className="mt-2 space-y-2">
         {routes.map((r) => {
@@ -412,7 +476,7 @@ function WhatIf({
 
 function BackgroundFeed({ idleLine, ticks }: { idleLine: string; ticks: number }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2">
+    <div className="flex items-center gap-2 rounded-lg attr-card bg-[var(--bg)] px-3 py-2">
       <Radar className="h-3.5 w-3.5 shrink-0 animate-pulse text-[var(--ai-cyan)]" />
       <p className="text-[11px] text-[var(--text-secondary)]">
         Background · {idleLine}
@@ -452,6 +516,48 @@ function NextDecision({ opp }: { opp: { title: string; match: number; reason: st
         </button>
       </div>
     </motion.div>
+  );
+}
+
+function ManagerFeedbackCard({ fb }: { fb: ManagerFeedback }) {
+  const accent: Accent = fb.sentiment === "watch" ? "pink" : fb.sentiment === "positive" ? "cyan" : "blue";
+  return (
+    <div className="rounded-xl attr-card bg-[var(--bg)] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 className="flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
+          <MessageSquareQuote className="h-4 w-4" style={{ color: ACCENT_HEX[accent] }} />
+          Manager feedback · considered by GPS
+        </h4>
+        <span className="text-[11px] text-[var(--text-muted)]">
+          {fb.from} · {fb.date}
+        </span>
+      </div>
+      <p className="mt-2 text-xs italic leading-5 text-[var(--text-secondary)]">&ldquo;{fb.summary}&rdquo;</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div>
+          <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+            <ThumbsUp className="h-3 w-3 text-[var(--ai-cyan)]" />
+            Strengths
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            {fb.strengths.map((s) => (
+              <li key={s} className="text-[11px] leading-4 text-[var(--text-secondary)]">· {s}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+            <TrendingUp className="h-3 w-3 text-[var(--ai-orange)]" />
+            Development areas → GPS gaps
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            {fb.developmentAreas.map((s) => (
+              <li key={s} className="text-[11px] leading-4 text-[var(--text-secondary)]">· {s}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }
 

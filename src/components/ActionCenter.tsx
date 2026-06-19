@@ -44,7 +44,7 @@ export function ActionCenter({
             <button
               key={a.label}
               onClick={a.onClick}
-              className="surface-hover group flex items-start gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3 text-left"
+              className="surface-hover group flex items-start gap-2.5 rounded-lg attr-card bg-[var(--bg)] p-3 text-left"
             >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium leading-5 text-[var(--text-primary)]">{a.label}</p>

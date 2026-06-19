@@ -44,12 +44,73 @@ export type CareerHealth = {
   promotionReadiness: HealthBand;
 };
 
+/** A single Key Performance Parameter from the HCLTech appraisal format. */
+export type Kpp = {
+  /** e.g. "Revenue", "Gross Margin", "Customer Satisfaction (CSAT)". */
+  name: string;
+  category: "Customer" | "Financial" | "Operations" | "Learning";
+  /** Weight in the appraisal, as a percentage. */
+  weight: number;
+  /** Target, kept as a display string ("80", "2.8M", "30%"). */
+  target: string;
+  /** Achievement, kept as a display string ("78", "2.4M", "22%"). */
+  achievement: string;
+  /** Score out of 10. */
+  score: number;
+  /** How this KPP reads as a Career GPS signal. */
+  signal: string;
+  /** Direction vs target — drives colour. */
+  status: "ahead" | "ontrack" | "behind";
+};
+
+/** One axis of promotion readiness, scored against its target. */
+export type PromotionDimension = {
+  label: string;
+  /** Current attainment, as a percentage of target (can exceed 100). */
+  current: number;
+  status: "exceeds" | "ontrack" | "development" | "critical";
+};
+
+/** Promotion-readiness rollup Sakha computes from KPP + Career GPS progress. */
+export type PromotionReadiness = {
+  /** Overall readiness today, 0-100. */
+  overall: number;
+  /** Readiness target for the next window. */
+  target: number;
+  /** Days to reach the target with the active plan. */
+  targetWindowDays: number;
+  dimensions: PromotionDimension[];
+};
+
+/** One section of the self-assessment Sakha auto-drafts from the Twin. */
+export type SelfAssessmentSection = {
+  heading: string;
+  body: string;
+};
+
+/** Manager feedback on file — an input Career GPS reasons over. */
+export type ManagerFeedback = {
+  /** Manager who gave it, e.g. "Vikram Nair". */
+  from: string;
+  date: string;
+  /** Overall read, used to colour and weight the signal. */
+  sentiment: "positive" | "constructive" | "watch";
+  /** One-line summary of the latest review/check-in. */
+  summary: string;
+  strengths: string[];
+  developmentAreas: string[];
+};
+
 export type EmployeeTwin = {
   id: PersonaId;
   name: string;
   fullName: string;
   employeeId: string;
   role: string;
+  /** Career level, e.g. "E4". */
+  level?: string;
+  /** Highest qualification, e.g. "B.Tech — Information Technology". */
+  education?: string;
   band: number;
   stage: string;
   stageColor: "blue" | "green" | "orange";
@@ -70,6 +131,16 @@ export type EmployeeTwin = {
   tracks?: Track[];
   /** Executive career-health snapshot. */
   careerHealth?: CareerHealth;
+  /** KPP appraisal record — the performance data Career GPS reasons over. */
+  kpps?: Kpp[];
+  /** Overall appraisal rating, e.g. "Consistently Meets Expectations". */
+  overallRating?: string;
+  /** Promotion-readiness rollup, scored against the next-level target. */
+  promotion?: PromotionReadiness;
+  /** Self-assessment Sakha auto-drafts from the achievement log + KPP data. */
+  selfAssessment?: SelfAssessmentSection[];
+  /** Latest manager feedback on file — an input Career GPS reasons over. */
+  managerFeedback?: ManagerFeedback;
   learning?: {
     currentCourse: string;
     completion: number;
@@ -213,6 +284,8 @@ export type HrAction = {
 
 export type HrInsights = {
   hrPartner: string;
+  /** HR partner's title, e.g. "Chief People Officer". */
+  hrPartnerTitle?: string;
   asOf: string;
   /** Headline org metrics. */
   aiReadiness: number;
