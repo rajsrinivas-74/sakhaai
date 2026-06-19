@@ -31,7 +31,7 @@ export function AskSakhaView({ role }: { role: "manager" | "hr" }) {
       </header>
 
       <div className="thin-scroll flex-1 overflow-y-auto p-6">
-        <AskSakha agent={agent} responder={responder} suggestions={suggestions} flat placeholder={`Ask about ${scope}…`} />
+        <AskSakha agent={agent} role={role} responder={responder} suggestions={suggestions} flat placeholder={`Ask about ${scope}…`} />
       </div>
     </div>
   );

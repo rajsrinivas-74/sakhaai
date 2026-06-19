@@ -17,12 +17,16 @@ export type AskAnswer = { text: string; matches?: AskMatch[]; cta?: string };
 export function AskSakha({
   suggestions,
   responder,
+  role,
   agent = "workforce",
   placeholder = "Ask Sakha anything…",
   flat = false,
 }: {
   suggestions: string[];
+  /** Deterministic responder used as a fallback when the live call fails. */
   responder: (q: string) => AskAnswer;
+  /** Lens the question is answered for — drives which data the model reasons over. */
+  role: "manager" | "hr";
   agent?: AgentId;
   placeholder?: string;
   /** Drop the outer card chrome (for use inside a full panel/view). */
@@ -31,16 +35,30 @@ export function AskSakha({
   const [q, setQ] = useState("");
   const [thinking, setThinking] = useState(false);
   const [answer, setAnswer] = useState<AskAnswer | null>(null);
+  const [source, setSource] = useState<"openai" | "fallback" | null>(null);
 
-  function ask(question: string) {
+  async function ask(question: string) {
     if (!question.trim()) return;
     setQ(question);
     setThinking(true);
     setAnswer(null);
-    setTimeout(() => {
+    setSource(null);
+    try {
+      const res = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, question }),
+      });
+      const data = (await res.json()) as { answer: AskAnswer; source: "openai" | "fallback" };
+      setAnswer(data.answer);
+      setSource(data.source);
+    } catch {
+      // Network/Server failure → deterministic local answer, demo never blocks.
       setAnswer(responder(question));
+      setSource("fallback");
+    } finally {
       setThinking(false);
-    }, 850);
+    }
   }
 
   return (
@@ -92,6 +110,11 @@ export function AskSakha({
             className="mt-3 rounded-xl border p-3"
             style={{ borderColor: accentRgba(agent === "wellbeing" ? "pink" : "cyan", 0.4), background: accentRgba("cyan", 0.06) }}
           >
+            {source && (
+              <span className="mb-2 inline-block rounded-md border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
+                {source === "openai" ? "Live · OpenAI" : "Local model"}
+              </span>
+            )}
             <p className="text-sm leading-6 text-[var(--text-primary)]">{answer.text}</p>
 
             {answer.matches && answer.matches.length > 0 && (
