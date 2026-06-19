@@ -68,6 +68,22 @@ export function SakhaChat({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
+  // Drop the GPS confirm prompt without navigating (employee chose "Not now").
+  function dismissGps(id: string) {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, action: undefined } : m)),
+    );
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: nextId(),
+        role: "sakha",
+        text: "No problem — whenever you're ready, just say “map my AI delivery path” and I'll open it.",
+        time: "now",
+      },
+    ]);
+  }
+
   async function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -91,13 +107,22 @@ export function SakhaChat({
       await new Promise((r) => setTimeout(r, 1100));
       const resp = data.response;
 
+      // Role-change query → give an update and ASK before opening GPS.
+      // We attach the action to the message so the bubble renders a confirm
+      // CTA; navigation only happens when the employee clicks it.
       if (resp.action === "navigate_to_career_gps") {
         setMessages((prev) => [
           ...prev,
-          { id: nextId(), role: "sakha", text: resp.text, time: "now" },
+          {
+            id: nextId(),
+            role: "sakha",
+            text: resp.text,
+            time: "now",
+            action: "navigate_to_career_gps",
+            quickReplies: resp.quickReplies,
+          },
         ]);
         setTyping(false);
-        setTimeout(() => onNavigateCareer(twin.careerGoal), 700);
         return;
       }
 
@@ -156,7 +181,14 @@ export function SakhaChat({
 
       <div ref={scrollRef} className="thin-scroll flex-1 space-y-4 overflow-y-auto p-6">
         {messages.map((m) => (
-          <Bubble key={m.id} message={m} onQuickReply={send} onSelectRole={onNavigateCareer} />
+          <Bubble
+            key={m.id}
+            message={m}
+            onQuickReply={send}
+            onSelectRole={onNavigateCareer}
+            onOpenGps={() => onNavigateCareer(twin.careerGoal)}
+            onDismissGps={() => dismissGps(m.id)}
+          />
         ))}
         {typing && <Typing />}
       </div>
@@ -188,12 +220,17 @@ function Bubble({
   message,
   onQuickReply,
   onSelectRole,
+  onOpenGps,
+  onDismissGps,
 }: {
   message: ChatMessage;
   onQuickReply: (text: string) => void;
   onSelectRole: (goal: string) => void;
+  onOpenGps: () => void;
+  onDismissGps: () => void;
 }) {
   const isSakha = message.role === "sakha";
+  const gpsPrompt = message.action === "navigate_to_career_gps";
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -213,6 +250,26 @@ function Bubble({
         </div>
 
         {message.card && <CardView card={message.card} onSelectRole={onSelectRole} />}
+
+        {gpsPrompt && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              onClick={onOpenGps}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold text-white"
+              style={{ background: ACCENT_HEX.purple }}
+            >
+              <Target className="h-3.5 w-3.5" />
+              Open my Career GPS
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onDismissGps}
+              className="surface-hover rounded-full border border-[var(--border)] px-3.5 py-1.5 text-xs font-medium text-[var(--text-secondary)]"
+            >
+              Not now
+            </button>
+          </div>
+        )}
 
         {message.quickReplies && (
           <div className="mt-2 flex flex-wrap gap-2">

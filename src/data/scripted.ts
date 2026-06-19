@@ -28,7 +28,7 @@ export const scriptedResponses: { match: string[]; response: ScriptedResponse }[
       "show me my ai delivery path",
     ],
     response: {
-      text: "I hear you — four years in one role is exactly when a deliberate move matters most. Your delivery and commercial track record gives you a real head start toward AI delivery. Let me build your mission against your Digital Twin. Opening Career GPS…",
+      text: "I hear you — four years in one role is exactly when a deliberate move matters most. Here's a quick read from your Digital Twin: you're about 38% ready for AI Delivery Manager today, on a ~90-day path with an 84% success probability, and there are already 3 internal roles matching you. Want me to open your full Career GPS so we can map the roadmap, skill gaps and roles together?",
       action: "navigate_to_career_gps",
     },
   },
