@@ -2,12 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sidebar, MobileBar, type View, type Role } from "@/components/Sidebar";
+import { Sidebar, MobileBar, DEFAULT_VIEW, type View, type Role } from "@/components/Sidebar";
 import { SakhaChat } from "@/components/SakhaChat";
 import { CareerGps } from "@/components/CareerGps";
 import { ManagerCopilot } from "@/components/ManagerCopilot";
 import { HRCommandCenter } from "@/components/HRCommandCenter";
 import { AskSakhaView } from "@/components/AskSakhaView";
+import {
+  EmployeeOverview,
+  EmployeePerformance,
+  EmployeeGrowth,
+  EmployeeOpportunities,
+} from "@/components/EmployeePages";
 import { DigitalTwin } from "@/components/DigitalTwin";
 import { AgentDock } from "@/components/AgentDock";
 import { LiveRail } from "@/components/LiveRail";
@@ -32,13 +38,7 @@ export function SakhaApp({
   const twin = persona ? personaById(persona) : null;
 
   const [view, setView] = useState<View>(
-    role === "manager"
-      ? "manager"
-      : role === "hr"
-        ? "hr"
-        : initialView === "career"
-          ? "career"
-          : "chat",
+    role === "employee" && initialView === "career" ? "career" : DEFAULT_VIEW[role],
   );
   const [careerPrefill, setCareerPrefill] = useState<string | null>(
     !isManager && initialView === "career" && twin ? twin.careerGoal : null,
@@ -113,9 +113,9 @@ export function SakhaApp({
                 {view === "ask" ? (
                   <AskSakhaView role={isManager ? "manager" : "hr"} />
                 ) : isManager ? (
-                  <ManagerCopilot />
+                  <ManagerCopilot view={view} onView={navView} />
                 ) : (
-                  <HRCommandCenter />
+                  <HRCommandCenter view={view} onView={navView} />
                 )}
               </div>
               <div className="hidden min-h-0 xl:block">
@@ -135,6 +135,14 @@ export function SakhaApp({
                       onNotifAction={handleNotifAction}
                       onNotifDismiss={() => setNotif(null)}
                     />
+                  ) : view === "emp-performance" ? (
+                    <EmployeePerformance twin={twin} />
+                  ) : view === "emp-growth" ? (
+                    <EmployeeGrowth twin={twin} />
+                  ) : view === "emp-opportunities" ? (
+                    <EmployeeOpportunities twin={twin} />
+                  ) : view === "emp-overview" ? (
+                    <EmployeeOverview twin={twin} onView={navView} />
                   ) : (
                     <SakhaChat twin={twin} onNavigateCareer={navigateCareer} />
                   )}

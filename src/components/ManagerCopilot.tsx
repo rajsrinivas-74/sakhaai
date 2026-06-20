@@ -10,9 +10,12 @@ import {
   UserRound,
   Users,
 } from "lucide-react";
-import { READINESS_STATUS, managerData, type ReadinessMember } from "@/data/manager";
+import { HeartPulse, IndianRupee, LineChart, Sparkles } from "lucide-react";
+import { READINESS_STATUS, managerData, managerKpp, type ReadinessMember } from "@/data/manager";
 import { personaById } from "@/data/personas";
 import { seedAgentEvents } from "@/data/agents";
+import { DrillCard } from "@/components/DrillCard";
+import type { View } from "@/components/Sidebar";
 import { useOverlay } from "@/lib/useOverlay";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 import { AgentActivity } from "@/components/AgentActivity";
@@ -43,9 +46,17 @@ const BRIEFING_ACTIONS = [
   "Approve the AI Upskilling Cohort",
 ];
 
-export function ManagerCopilot() {
+export function ManagerCopilot({
+  view = "mgr-overview",
+  onView,
+}: {
+  view?: View;
+  onView?: (v: View) => void;
+} = {}) {
   const [draft, setDraft] = useState<AgentDraft>(null);
   const overlay = useOverlay();
+  const go = (v: View) => onView?.(v);
+  const marginPct = Math.round((managerKpp.margin.actual / managerKpp.margin.target) * 100);
   const liveEvents = [
     ...seedAgentEvents.filter((ev) => ev.phase !== "hr"),
     ...overlay.events.filter((ev) => ev.phase !== "hr"),
@@ -140,67 +151,77 @@ export function ManagerCopilot() {
           </div>
         )}
 
-        {/* KEY ACTIONS — pinned at top */}
-        <ActionCenter items={keyActions} />
-
-        {/* HERO BRIEFING */}
-        <Briefing
-          greeting="Good morning, Vikram"
-          lead={`Overnight I analyzed your ${managerData.teamSize} team members.`}
-          findings={BRIEFING_FINDINGS}
-          actions={BRIEFING_ACTIONS}
-          agent="manager"
-        />
-
-        {/* TEAM READINESS MAP */}
-        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
-              Team readiness · {managerData.readinessProject}
+        {/* OVERVIEW — dashboard cards drill into the sub-pages */}
+        {view === "mgr-overview" && (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <DrillCard icon={Users} label="Team health" value={`${managerData.teamHealthScore}%`} sub="4 at risk · trending down" accent="cyan" onOpen={() => go("mgr-team")} />
+              <DrillCard icon={IndianRupee} label="Your margin KPP" value={`${marginPct}%`} sub={`₹${managerKpp.margin.actual} / ${managerKpp.margin.target} Cr`} accent="purple" onOpen={() => go("mgr-performance")} />
+              <DrillCard icon={HeartPulse} label="Retention risk" value="Rajan 73%" sub="8 late nights · act this week" accent="pink" onOpen={() => go("mgr-retention")} />
+              <DrillCard icon={Users} label="Project readiness" value={`${managerData.projectReadiness}%`} sub={managerData.readinessProject} accent="blue" onOpen={() => go("mgr-team")} />
+              <DrillCard icon={LineChart} label="Your revenue KPP" value={`${Math.round((managerKpp.revenue.actual / managerKpp.revenue.target) * 100)}%`} sub={`₹${managerKpp.revenue.actual} / ${managerKpp.revenue.target} Cr`} accent="cyan" onOpen={() => go("mgr-performance")} />
+              <DrillCard icon={Sparkles} label="Scenarios" value="What-if" sub="Model attrition & upskilling" accent="orange" onOpen={() => go("mgr-scenarios")} />
             </div>
-            <span className="text-sm font-bold text-[var(--text-primary)]">{managerData.projectReadiness}%</span>
-          </div>
-          <div className="mt-2 h-2 rounded-full bg-[var(--border)]">
-            <div className="h-2 rounded-full" style={{ width: `${managerData.projectReadiness}%`, background: ACCENT_HEX.cyan }} />
-          </div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {managerData.readinessTeam.map((m) => (
-              <ReadinessRow key={m.name} member={m} />
-            ))}
-          </div>
-        </div>
+            <ActionCenter items={keyActions} />
+            <Briefing
+              greeting="Good morning, Vikram"
+              lead={`Overnight I analyzed your ${managerData.teamSize} team members.`}
+              findings={BRIEFING_FINDINGS}
+              actions={BRIEFING_ACTIONS}
+              agent="manager"
+            />
+            <AgentActivity events={liveEvents} title="Agent activity" compact />
+          </>
+        )}
 
-        {/* YOUR KPP — revenue & margin rolled up from the team */}
-        <ManagerKppRollup />
+        {/* TEAM & READINESS */}
+        {view === "mgr-team" && (
+          <>
+            <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
+                  Team readiness · {managerData.readinessProject}
+                </div>
+                <span className="text-sm font-bold text-[var(--text-primary)]">{managerData.projectReadiness}%</span>
+              </div>
+              <div className="mt-2 h-2 rounded-full bg-[var(--border)]">
+                <div className="h-2 rounded-full" style={{ width: `${managerData.projectReadiness}%`, background: ACCENT_HEX.cyan }} />
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {managerData.readinessTeam.map((m) => (
+                  <ReadinessRow key={m.name} member={m} />
+                ))}
+              </div>
+            </div>
+            <EmployeeSpotlight onAct={setDraft} />
+            <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
+                AI talent pipeline
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                <PipelineCell label="Ready today" value={managerData.talentPipeline.readyToday} accent="cyan" />
+                <PipelineCell label="Ready in 30 days" value={managerData.talentPipeline.ready30} accent="blue" />
+                <PipelineCell label="Ready in 90 days" value={managerData.talentPipeline.ready90} accent="purple" />
+              </div>
+            </div>
+          </>
+        )}
 
-        {/* WHAT-IF (signature) */}
-        <ManagerWhatIf />
+        {/* PERFORMANCE & KPP */}
+        {view === "mgr-performance" && <ManagerKppRollup />}
 
-        {/* ATTRITION DEEP-DIVE (Rajan) */}
-        <AttritionSimulator />
+        {/* RETENTION */}
+        {view === "mgr-retention" && (
+          <>
+            <AttritionSimulator />
+            <RiskCenter onAct={setDraft} flags={overlay.retentionFlags} />
+          </>
+        )}
 
-        {/* SPOTLIGHT + RISK CENTER */}
-        <div className="grid gap-4 lg:grid-cols-2">
-          <EmployeeSpotlight onAct={setDraft} />
-          <RiskCenter onAct={setDraft} flags={overlay.retentionFlags} />
-        </div>
-
-        {/* TALENT PIPELINE */}
-        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-            <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
-            AI talent pipeline
-          </div>
-          <div className="mt-3 grid grid-cols-3 gap-3">
-            <PipelineCell label="Ready today" value={managerData.talentPipeline.readyToday} accent="cyan" />
-            <PipelineCell label="Ready in 30 days" value={managerData.talentPipeline.ready30} accent="blue" />
-            <PipelineCell label="Ready in 90 days" value={managerData.talentPipeline.ready90} accent="purple" />
-          </div>
-        </div>
-
-        {/* AGENT ACTIVITY */}
-        <AgentActivity events={liveEvents} title="Agent activity" compact />
+        {/* SCENARIOS */}
+        {view === "mgr-scenarios" && <ManagerWhatIf />}
       </div>
 
       <AgentDraftPanel draft={draft} onClose={() => setDraft(null)} />

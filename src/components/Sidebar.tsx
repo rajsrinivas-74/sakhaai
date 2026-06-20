@@ -2,51 +2,106 @@
 
 import Link from "next/link";
 import {
+  BadgeCheck,
+  Briefcase,
   Compass,
+  GraduationCap,
+  HeartPulse,
   LayoutDashboard,
+  Layers,
+  LineChart,
   LogOut,
   MessageCircle,
   MessagesSquare,
   Network,
+  Route,
   ShieldCheck,
   Sparkles,
+  Target,
+  Users,
 } from "lucide-react";
 import type { EmployeeTwin } from "@/types/sakha";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 import { SakhaLogo } from "@/components/SakhaLogo";
 
-export type View = "chat" | "career" | "manager" | "hr" | "ask";
+export type View =
+  // Employee — under "Career GPS"
+  | "emp-overview"
+  | "chat"
+  | "career"
+  | "emp-performance"
+  | "emp-growth"
+  | "emp-opportunities"
+  // Manager — under "Manager Copilot"
+  | "mgr-overview"
+  | "mgr-team"
+  | "mgr-performance"
+  | "mgr-retention"
+  | "mgr-scenarios"
+  // Capability Manager — under "Workforce Intelligence"
+  | "hr-overview"
+  | "hr-demand"
+  | "hr-capability"
+  | "hr-buildbuy"
+  | "hr-talent"
+  // shared
+  | "ask";
 
 export type Role = "employee" | "manager" | "hr";
 
-type NavItem = { id: View; label: string; icon: typeof MessageCircle; accent: Accent };
+type SubItem = { id: View; label: string; icon: typeof MessageCircle };
+type NavGroup = { feature: string; icon: typeof Compass; accent: Accent; items: SubItem[] };
 
-const EMPLOYEE_NAV: NavItem[] = [
-  { id: "chat", label: "Sakha Chat", icon: MessageCircle, accent: "blue" },
-  { id: "career", label: "Career GPS", icon: Compass, accent: "purple" },
-];
-
-const MANAGER_NAV: NavItem[] = [
-  { id: "manager", label: "Manager Copilot", icon: LayoutDashboard, accent: "cyan" },
-  { id: "ask", label: "Ask Sakha", icon: MessagesSquare, accent: "purple" },
-];
-
-const HR_NAV: NavItem[] = [
-  { id: "hr", label: "Workforce Intelligence", icon: Network, accent: "blue" },
-  { id: "ask", label: "Ask Sakha", icon: MessagesSquare, accent: "purple" },
-];
-
-const NAV_FOR: Record<Role, NavItem[]> = {
-  employee: EMPLOYEE_NAV,
-  manager: MANAGER_NAV,
-  hr: HR_NAV,
+export const NAV_FOR: Record<Role, NavGroup> = {
+  employee: {
+    feature: "Career GPS",
+    icon: Compass,
+    accent: "purple",
+    items: [
+      { id: "emp-overview", label: "Overview", icon: LayoutDashboard },
+      { id: "chat", label: "Sakha Chat", icon: MessageCircle },
+      { id: "career", label: "Roadmap", icon: Route },
+      { id: "emp-performance", label: "My Performance", icon: Target },
+      { id: "emp-growth", label: "Growth & Learning", icon: GraduationCap },
+      { id: "emp-opportunities", label: "Opportunities", icon: Briefcase },
+    ],
+  },
+  manager: {
+    feature: "Manager Copilot",
+    icon: LayoutDashboard,
+    accent: "cyan",
+    items: [
+      { id: "mgr-overview", label: "Overview", icon: LayoutDashboard },
+      { id: "mgr-team", label: "Team & Readiness", icon: Users },
+      { id: "mgr-performance", label: "Performance & KPP", icon: LineChart },
+      { id: "mgr-retention", label: "Retention", icon: HeartPulse },
+      { id: "mgr-scenarios", label: "Scenarios", icon: Sparkles },
+      { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
+    ],
+  },
+  hr: {
+    feature: "Workforce Intelligence",
+    icon: Network,
+    accent: "blue",
+    items: [
+      { id: "hr-overview", label: "Overview", icon: LayoutDashboard },
+      { id: "hr-demand", label: "Demand & Programs", icon: Layers },
+      { id: "hr-capability", label: "Capability", icon: BadgeCheck },
+      { id: "hr-buildbuy", label: "Build vs Buy", icon: LineChart },
+      { id: "hr-talent", label: "Talent & Retention", icon: Users },
+      { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
+    ],
+  },
 };
 
-const STAGE_ACCENT: Record<string, Accent> = {
-  blue: "blue",
-  green: "cyan",
-  orange: "orange",
+/** Default landing section per role. Employee keeps Chat as the golden-path entry. */
+export const DEFAULT_VIEW: Record<Role, View> = {
+  employee: "chat",
+  manager: "mgr-overview",
+  hr: "hr-overview",
 };
+
+const STAGE_ACCENT: Record<string, Accent> = { blue: "blue", green: "cyan", orange: "orange" };
 
 type Identity = { name: string; role: string; stage: string; initial: string; accent: Accent };
 
@@ -82,8 +137,9 @@ export function Sidebar({
   onView: (v: View) => void;
 }) {
   const identity = getIdentity(role, twin);
-  const nav = NAV_FOR[role];
+  const group = NAV_FOR[role];
   const isEmployee = role === "employee";
+  const FeatureIcon = group.icon;
 
   return (
     <aside className="surface flex h-full flex-col gap-6 p-5" style={{ background: "var(--sidebar)" }}>
@@ -109,12 +165,8 @@ export function Sidebar({
             {identity.initial}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-sm font-medium text-[var(--text-primary)]">
-              {identity.name}
-            </span>
-            <span className="block truncate text-xs text-[var(--text-secondary)]">
-              {identity.stage}
-            </span>
+            <span className="block truncate text-sm font-medium text-[var(--text-primary)]">{identity.name}</span>
+            <span className="block truncate text-xs text-[var(--text-secondary)]">{identity.stage}</span>
           </span>
         </div>
         <Link
@@ -127,16 +179,25 @@ export function Sidebar({
         </Link>
       </div>
 
-      <nav className="space-y-1">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          Workspace
-        </p>
-        {nav.map((item) => (
-          <NavButton key={item.id} item={item} active={view === item.id} onClick={() => onView(item.id)} />
-        ))}
+      {/* FLAGSHIP FEATURE + nested sub-menu */}
+      <nav className="min-h-0 flex-1 overflow-y-auto">
+        <div
+          className="mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5"
+          style={{ background: accentRgba(group.accent, 0.1) }}
+        >
+          <FeatureIcon className="h-4 w-4" style={{ color: ACCENT_HEX[group.accent] }} />
+          <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: ACCENT_HEX[group.accent] }}>
+            {group.feature}
+          </span>
+        </div>
+        <div className="space-y-0.5 border-l border-[var(--border)] pl-2">
+          {group.items.map((item) => (
+            <SubButton key={item.id} item={item} accent={group.accent} active={view === item.id} onClick={() => onView(item.id)} />
+          ))}
+        </div>
       </nav>
 
-      <div className="mt-auto rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
         <div className="flex items-center gap-2 text-[var(--ai-cyan)]">
           <ShieldCheck className="h-4 w-4" />
           <span className="text-xs font-semibold uppercase tracking-[0.16em]">
@@ -155,6 +216,24 @@ export function Sidebar({
   );
 }
 
+function SubButton({ item, accent, active, onClick }: { item: SubItem; accent: Accent; active: boolean; onClick: () => void }) {
+  const Icon = item.icon;
+  return (
+    <button
+      onClick={onClick}
+      className="surface-hover flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] font-medium"
+      style={{
+        color: active ? "var(--text-primary)" : "var(--text-secondary)",
+        background: active ? accentRgba(accent, 0.12) : "transparent",
+        boxShadow: active ? `inset 2px 0 0 ${ACCENT_HEX[accent]}` : "none",
+      }}
+    >
+      <Icon className="h-3.5 w-3.5" style={{ color: active ? ACCENT_HEX[accent] : "currentColor" }} />
+      {item.label}
+    </button>
+  );
+}
+
 /* ── Mobile top bar (below lg) ─────────────────────────────────────────── */
 export function MobileBar({
   role,
@@ -170,7 +249,7 @@ export function MobileBar({
   onOpenTwin: () => void;
 }) {
   const identity = getIdentity(role, twin);
-  const nav = NAV_FOR[role];
+  const group = NAV_FOR[role];
   const isEmployee = role === "employee";
 
   return (
@@ -181,7 +260,7 @@ export function MobileBar({
         </Link>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{identity.name}</p>
-          <p className="truncate text-[11px] text-[var(--text-secondary)]">{identity.stage}</p>
+          <p className="truncate text-[11px] text-[var(--text-secondary)]">{group.feature}</p>
         </div>
         {isEmployee && twin && (
           <button
@@ -201,47 +280,27 @@ export function MobileBar({
         </Link>
       </div>
 
-      {nav.length > 1 && (
-        <div className="grid grid-cols-2 gap-1.5">
-          {nav.map((item) => {
-            const active = view === item.id;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onView(item.id)}
-                className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold"
-                style={{
-                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                  background: active ? accentRgba(item.accent, 0.14) : "var(--card)",
-                  border: `1px solid ${active ? accentRgba(item.accent, 0.5) : "var(--border)"}`,
-                }}
-              >
-                <Icon className="h-3.5 w-3.5" style={{ color: active ? ACCENT_HEX[item.accent] : "currentColor" }} />
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="thin-scroll flex gap-1.5 overflow-x-auto pb-1">
+        {group.items.map((item) => {
+          const active = view === item.id;
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onView(item.id)}
+              className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold"
+              style={{
+                color: active ? "var(--text-primary)" : "var(--text-secondary)",
+                background: active ? accentRgba(group.accent, 0.14) : "var(--card)",
+                border: `1px solid ${active ? accentRgba(group.accent, 0.5) : "var(--border)"}`,
+              }}
+            >
+              <Icon className="h-3.5 w-3.5" style={{ color: active ? ACCENT_HEX[group.accent] : "currentColor" }} />
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
-  );
-}
-
-function NavButton({ item, active, onClick }: { item: NavItem; active: boolean; onClick: () => void }) {
-  const Icon = item.icon;
-  return (
-    <button
-      onClick={onClick}
-      className="surface-hover flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium"
-      style={{
-        color: active ? "var(--text-primary)" : "var(--text-secondary)",
-        background: active ? accentRgba(item.accent, 0.12) : "transparent",
-        boxShadow: active ? `inset 2px 0 0 ${ACCENT_HEX[item.accent]}` : "none",
-      }}
-    >
-      <Icon className="h-4 w-4" style={{ color: active ? ACCENT_HEX[item.accent] : "currentColor" }} />
-      {item.label}
-    </button>
   );
 }

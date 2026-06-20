@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 import {
+  BadgeCheck,
+  Briefcase,
   CalendarDays,
   HeartPulse,
+  IndianRupee,
+  Layers,
   Leaf,
   Radar,
   TrendingUp,
@@ -23,6 +27,7 @@ import {
   workforceForecast,
   retentionIntel,
   reskillEconomics,
+  buildVsBuyTotalSavingCr,
 } from "@/data/workforce";
 import { seedAgentEvents } from "@/data/agents";
 import { personaById } from "@/data/personas";
@@ -41,6 +46,8 @@ import { EmergingSkillsRadar } from "@/components/EmergingSkillsRadar";
 import { PipelineToDemand } from "@/components/PipelineToDemand";
 import { Briefing, type BriefingFinding } from "@/components/Briefing";
 import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
+import { DrillCard } from "@/components/DrillCard";
+import type { View } from "@/components/Sidebar";
 
 const HR_FINDINGS: BriefingFinding[] = [
   { tone: "risk", text: "AI demand exceeds supply by 54 employees" },
@@ -70,8 +77,12 @@ const IMPACT_AGENT: Record<HrAction["impact"], AgentId> = {
 };
 
 export function HRCommandCenter({
+  view = "hr-overview",
+  onView,
   events = seedAgentEvents,
 }: {
+  view?: View;
+  onView?: (v: View) => void;
   events?: AgentEvent[];
 }) {
   const [draft, setDraft] = useState<AgentDraft>(null);
@@ -80,9 +91,8 @@ export function HRCommandCenter({
   const overlay = useOverlay();
   const liveEvents = [...events, ...overlay.events];
   const committed = overlay.commitments;
+  const go = (v: View) => onView?.(v);
 
-  // Pull the live rollup (model headline when a key is present), refreshing as
-  // commitments land so the headline can name a fresh mover.
   useEffect(() => {
     let active = true;
     fetch("/api/hr-insights", { cache: "no-store" })
@@ -112,7 +122,6 @@ export function HRCommandCenter({
 
   return (
     <div className="surface relative flex h-full flex-col overflow-hidden">
-      {/* TOP BAR */}
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-6 py-4">
         <div className="flex items-center gap-3">
           <span
@@ -149,7 +158,7 @@ export function HRCommandCenter({
       </header>
 
       <div className="thin-scroll flex-1 space-y-5 overflow-y-auto p-6">
-        {/* LIVE GOLDEN-THREAD BANNER */}
+        {/* LIVE GOLDEN-THREAD BANNER — always visible */}
         {committed.length > 0 && (
           <div
             className="flex items-center gap-2.5 rounded-xl border p-3"
@@ -161,184 +170,194 @@ export function HRCommandCenter({
             </span>
             <p className="text-xs leading-5 text-[var(--text-primary)]">
               {committed.map((c) => c.name.split(" ")[0]).join(", ")} just committed to{" "}
-              {committed.length === 1 ? `the ${committed[0].goal} path` : "new growth paths"} —
-              propagated to your board by the agent fleet.
+              {committed.length === 1 ? `the ${committed[0].goal} path` : "new growth paths"} — propagated to your
+              board by the agent fleet.
             </p>
           </div>
         )}
 
-        {/* KEY ACTIONS — pinned at top */}
-        <ActionCenter items={keyActions} />
+        {/* ── OVERVIEW ─────────────────────────────────────────────── */}
+        {view === "hr-overview" && (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <DrillCard icon={TrendingUp} label="AI readiness" value={`${insights.aiReadiness}%`} sub="vs 75% FY26 target" accent="cyan" onOpen={() => go("hr-demand")} />
+              <DrillCard icon={Layers} label="Demand vs supply" value="92 / 38" sub="AI/GenAI · gap −54, rising" accent="pink" onOpen={() => go("hr-demand")} />
+              <DrillCard icon={BadgeCheck} label="Capability depth" value="4 experts" sub="AI/GenAI — need 12 ⚠" accent="purple" onOpen={() => go("hr-capability")} />
+              <DrillCard icon={IndianRupee} label="Reskill saving" value={`₹${buildVsBuyTotalSavingCr.toFixed(1)} Cr`} sub="reskill over external hire" accent="blue" onOpen={() => go("hr-buildbuy")} />
+              <DrillCard icon={HeartPulse} label="Flight risk" value={`${retentionIntel.atRisk}`} sub={`${retentionIntel.retainable} retainable via mobility`} accent="pink" onOpen={() => go("hr-talent")} />
+              <DrillCard icon={Briefcase} label="Pipeline demand" value="3 deals" sub="→ capability demand by Q3" accent="orange" onOpen={() => go("hr-demand")} />
+            </div>
 
-        {/* RETENTION INTELLIGENCE — high priority for the Capability Manager */}
-        <div
-          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-5"
-          style={{ borderColor: accentRgba("pink", 0.4), background: accentRgba("pink", 0.05) }}
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-            <HeartPulse className="h-4 w-4 text-[var(--ai-pink)]" />
-            Retention intelligence
-          </div>
-          <p className="text-xs text-[var(--text-secondary)]">
-            <span className="font-bold text-[var(--text-primary)]">{retentionIntel.atRisk}</span> flight-risk ·{" "}
-            <span className="font-bold text-[var(--ai-cyan)]">{retentionIntel.retainable}</span> retainable via{" "}
-            {retentionIntel.lever.toLowerCase()}
-          </p>
-          <AgentChip agent="wellbeing" status="watching" />
-        </div>
+            <ActionCenter items={keyActions} />
 
-        {/* HERO BRIEFING */}
-        <Briefing
-          greeting={`Good morning, ${insights.hrPartner.split(" ")[0]}`}
-          lead="I analyzed 18,432 employees overnight."
-          findings={HR_FINDINGS}
-          actions={HR_ACTIONS}
-          agent="workforce"
-          source={source}
-        />
-
-        {/* TRANSFORMATION SCORECARD — OKRs vs target */}
-        <TransformationScorecard />
-
-        {/* HERO — RESKILLING SIMULATOR */}
-        <WorkforceSimulator />
-
-        {/* STRATEGIC PROGRAM DEMAND TRACKER */}
-        <ProgramDemandTracker onAct={setDraft} />
-
-        {/* PIPELINE → CAPABILITY DEMAND */}
-        <PipelineToDemand />
-
-        {/* ROLE-LEVEL GAP MAP + AGENT ACTIVITY */}
-        <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-            <div className="flex items-center justify-between">
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-5"
+              style={{ borderColor: accentRgba("pink", 0.4), background: accentRgba("pink", 0.05) }}
+            >
               <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-                <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
-                Workforce gap map
+                <HeartPulse className="h-4 w-4 text-[var(--ai-pink)]" />
+                Retention intelligence
               </div>
-              <div className="flex items-center gap-3 text-[11px] text-[var(--text-secondary)]">
-                <Legend color={ACCENT_HEX.pink} label="Demand" />
-                <Legend color={ACCENT_HEX.cyan} label="Supply" />
+              <p className="text-xs text-[var(--text-secondary)]">
+                <span className="font-bold text-[var(--text-primary)]">{retentionIntel.atRisk}</span> flight-risk ·{" "}
+                <span className="font-bold text-[var(--ai-cyan)]">{retentionIntel.retainable}</span> retainable via{" "}
+                {retentionIntel.lever.toLowerCase()}
+              </p>
+              <AgentChip agent="wellbeing" status="watching" />
+            </div>
+
+            <Briefing
+              greeting={`Good morning, ${insights.hrPartner.split(" ")[0]}`}
+              lead="I analyzed 18,432 employees overnight."
+              findings={HR_FINDINGS}
+              actions={HR_ACTIONS}
+              agent="workforce"
+              source={source}
+            />
+
+            <TransformationScorecard />
+
+            <AgentActivity events={liveEvents} title="Agent activity" compact />
+          </>
+        )}
+
+        {/* ── DEMAND & PROGRAMS ────────────────────────────────────── */}
+        {view === "hr-demand" && (
+          <>
+            <ProgramDemandTracker onAct={setDraft} />
+            <PipelineToDemand />
+            <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
+                  Workforce gap map
+                </div>
+                <div className="flex items-center gap-3 text-[11px] text-[var(--text-secondary)]">
+                  <Legend color={ACCENT_HEX.pink} label="Demand" />
+                  <Legend color={ACCENT_HEX.cyan} label="Supply" />
+                </div>
+              </div>
+              <div className="mt-4 space-y-3.5">
+                {roleGaps.map((r) => (
+                  <GapRow key={r.role} role={r.role} demand={r.demand} supply={r.supply} />
+                ))}
               </div>
             </div>
-            <div className="mt-4 space-y-3.5">
-              {roleGaps.map((r) => (
-                <GapRow key={r.role} role={r.role} demand={r.demand} supply={r.supply} />
-              ))}
-            </div>
-          </div>
+          </>
+        )}
 
-          <AgentActivity events={liveEvents} title="Agent activity" compact />
-        </div>
+        {/* ── CAPABILITY ───────────────────────────────────────────── */}
+        {view === "hr-capability" && (
+          <>
+            <CapabilityDepthHeatmap />
+            <EmergingSkillsRadar />
+            <AlliancePipeline />
+          </>
+        )}
 
-        {/* CAPABILITY DEPTH — proficiency behind the supply numbers */}
-        <CapabilityDepthHeatmap />
+        {/* ── BUILD VS BUY ─────────────────────────────────────────── */}
+        {view === "hr-buildbuy" && (
+          <>
+            <WorkforceSimulator />
+            <AiDeliveryManagerCase onAct={setDraft} />
+            <BuildVsBuyPortfolio />
+          </>
+        )}
 
-        {/* AI DELIVERY MANAGER — build vs buy (Priya's cohort) */}
-        <AiDeliveryManagerCase onAct={setDraft} />
-
-        {/* BUILD VS BUY — full critical-role portfolio */}
-        <BuildVsBuyPortfolio />
-
-        {/* ALLIANCE & CERTIFICATION PIPELINE */}
-        <AlliancePipeline />
-
-        {/* EMERGING SKILLS RADAR */}
-        <EmergingSkillsRadar />
-
-        {/* WORKFORCE SIGNALS */}
-        <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-            <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
-            Workforce signals
-            <span className="text-[11px] font-normal text-[var(--text-muted)]">· triaged by the Workforce Agent</span>
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {insights.signals.map((sig) => {
-              const accent = SEGMENT_ACCENT[sig.segment];
-              return (
-                <div
-                  key={sig.segment}
-                  className="rounded-xl border p-4"
-                  style={{ borderColor: accentRgba(accent, 0.4), background: accentRgba(accent, 0.06) }}
-                >
-                  <p className="text-3xl font-bold text-[var(--text-primary)]">{sig.count}</p>
-                  <p className="mt-0.5 text-xs font-semibold" style={{ color: ACCENT_HEX[accent] }}>{sig.label}</p>
-                  <p className="mt-1.5 text-[11px] leading-4 text-[var(--text-secondary)]">{sig.note}</p>
-                  {sig.members.length > 0 && (
-                    <div className="mt-2.5 flex flex-wrap gap-1.5">
-                      {sig.members.map((m) => (
-                        <span
-                          key={m}
-                          className="rounded-md px-2 py-0.5 text-[11px] font-medium"
-                          style={{ background: accentRgba(accent, 0.16), color: ACCENT_HEX[accent] }}
-                        >
-                          {personaById(m).name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* TALENT DISCOVERY + FUTURE WORKFORCE */}
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <Radar className="h-4 w-4 text-[var(--ai-orange)]" />
-              Talent discovery
-              <span className="text-[11px] font-normal text-[var(--text-muted)]">· found, not applied</span>
-            </div>
-            <div className="mt-3 space-y-2">
-              {talentDiscovery.map((t) => (
-                <div key={t.name} className="flex items-center gap-3 rounded-lg border border-[var(--border)] p-2.5">
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-                    style={{ background: accentRgba("orange", 0.16), color: ACCENT_HEX.orange }}
-                  >
-                    {t.initial}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-[var(--text-primary)]">{t.name}</p>
-                    <p className="truncate text-[11px] text-[var(--text-secondary)]">{t.reason}</p>
-                  </div>
-                  <span className="shrink-0 text-sm font-bold text-[var(--ai-cyan)]">{t.match}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-              <TrendingUp className="h-4 w-4 text-[var(--ai-cyan)]" />
-              Future workforce · AI-ready
-            </div>
-            <div className="mt-4 flex items-end justify-between gap-2">
-              {workforceForecast.map((f, i) => {
-                const max = workforceForecast[workforceForecast.length - 1].value;
-                const h = 30 + (f.value / max) * 70;
-                return (
-                  <div key={f.label} className="flex flex-1 flex-col items-center gap-1.5">
-                    <span className="text-sm font-bold text-[var(--text-primary)]">{f.value}</span>
+        {/* ── TALENT & RETENTION ───────────────────────────────────── */}
+        {view === "hr-talent" && (
+          <>
+            <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                <Users className="h-4 w-4 text-[var(--ai-cyan)]" />
+                Workforce signals
+                <span className="text-[11px] font-normal text-[var(--text-muted)]">· triaged by the Workforce Agent</span>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {insights.signals.map((sig) => {
+                  const accent = SEGMENT_ACCENT[sig.segment];
+                  return (
                     <div
-                      className="w-full rounded-t-md"
-                      style={{
-                        height: `${h}px`,
-                        background: i === workforceForecast.length - 1 ? ACCENT_HEX.cyan : accentRgba("cyan", 0.3),
-                      }}
-                    />
-                    <span className="text-[10px] text-[var(--text-muted)]">{f.label}</span>
-                  </div>
-                );
-              })}
+                      key={sig.segment}
+                      className="rounded-xl border p-4"
+                      style={{ borderColor: accentRgba(accent, 0.4), background: accentRgba(accent, 0.06) }}
+                    >
+                      <p className="text-3xl font-bold text-[var(--text-primary)]">{sig.count}</p>
+                      <p className="mt-0.5 text-xs font-semibold" style={{ color: ACCENT_HEX[accent] }}>{sig.label}</p>
+                      <p className="mt-1.5 text-[11px] leading-4 text-[var(--text-secondary)]">{sig.note}</p>
+                      {sig.members.length > 0 && (
+                        <div className="mt-2.5 flex flex-wrap gap-1.5">
+                          {sig.members.map((m) => (
+                            <span
+                              key={m}
+                              className="rounded-md px-2 py-0.5 text-[11px] font-medium"
+                              style={{ background: accentRgba(accent, 0.16), color: ACCENT_HEX[accent] }}
+                            >
+                              {personaById(m).name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </div>
 
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <Radar className="h-4 w-4 text-[var(--ai-orange)]" />
+                  Talent discovery
+                  <span className="text-[11px] font-normal text-[var(--text-muted)]">· found, not applied</span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {talentDiscovery.map((t) => (
+                    <div key={t.name} className="flex items-center gap-3 rounded-lg border border-[var(--border)] p-2.5">
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                        style={{ background: accentRgba("orange", 0.16), color: ACCENT_HEX.orange }}
+                      >
+                        {t.initial}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-[var(--text-primary)]">{t.name}</p>
+                        <p className="truncate text-[11px] text-[var(--text-secondary)]">{t.reason}</p>
+                      </div>
+                      <span className="shrink-0 text-sm font-bold text-[var(--ai-cyan)]">{t.match}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <TrendingUp className="h-4 w-4 text-[var(--ai-cyan)]" />
+                  Future workforce · AI-ready
+                </div>
+                <div className="mt-4 flex items-end justify-between gap-2">
+                  {workforceForecast.map((f, i) => {
+                    const max = workforceForecast[workforceForecast.length - 1].value;
+                    const h = 30 + (f.value / max) * 70;
+                    return (
+                      <div key={f.label} className="flex flex-1 flex-col items-center gap-1.5">
+                        <span className="text-sm font-bold text-[var(--text-primary)]">{f.value}</span>
+                        <div
+                          className="w-full rounded-t-md"
+                          style={{
+                            height: `${h}px`,
+                            background: i === workforceForecast.length - 1 ? ACCENT_HEX.cyan : accentRgba("cyan", 0.3),
+                          }}
+                        />
+                        <span className="text-[10px] text-[var(--text-muted)]">{f.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <AgentDraftPanel draft={draft} onClose={() => setDraft(null)} />
@@ -401,7 +420,6 @@ function CaseStat({ label, value, accent }: { label: string; value: string; acce
 
 function GapRow({ role, demand, supply }: { role: string; demand: number; supply: number }) {
   const gap = demand - supply;
-  // Bars are scaled against the largest demand so headcounts read proportionally.
   const scale = 100 / 92;
   return (
     <div>
@@ -440,4 +458,3 @@ function Legend({ color, label }: { color: string; label: string }) {
     </span>
   );
 }
-
