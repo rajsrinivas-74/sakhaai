@@ -4,8 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Bell,
-  BookOpen,
+  Bot,
   BriefcaseBusiness,
   Building2,
   CheckCircle2,
@@ -13,12 +12,14 @@ import {
   GraduationCap,
   HeartPulse,
   LayoutDashboard,
-  MessageCircle,
+  Network,
   Rocket,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
+import { agentList } from "@/data/agents";
+import type { AgentId } from "@/types/sakha";
 import { SakhaLogo } from "@/components/SakhaLogo";
 
 const STACK = [
@@ -92,47 +93,56 @@ type Feature = {
 const FEATURES: Feature[] = [
   {
     icon: Compass,
-    title: "Career GPS",
-    desc: "Readiness score, prioritised skill gaps, a day-by-day roadmap, success probability, and matching internal roles — generated against the Digital Twin.",
+    title: "Career GPS & Mission Control",
+    desc: "Readiness score, prioritised skill gaps, a 90-day roadmap, success probability, and matching internal roles — plus a KPP scorecard and a 5-dimension promotion-readiness gauge that ties learning to real FY performance.",
     accent: "purple",
   },
   {
-    icon: MessageCircle,
-    title: "Sakha Chat",
-    desc: "A companion that speaks first. Scripted golden flows plus live OpenAI answers, with ticket and reimbursement actions handled inline.",
+    icon: LayoutDashboard,
+    title: "Manager Copilot",
+    desc: "Team readiness map, KPP rollup across reports, retention risk with burnout signals, and what-if scenarios that re-forecast attrition live as the manager toggles interventions.",
+    accent: "cyan",
+  },
+  {
+    icon: Network,
+    title: "Workforce Intelligence",
+    desc: "Org-wide demand vs supply, a Build-vs-Buy portfolio surfacing ₹35.5 Cr of reskill savings over external hiring, a capability-depth heatmap, and transformation programs mapped to the deal pipeline.",
     accent: "blue",
   },
   {
     icon: Sparkles,
     title: "Employee Digital Twin",
-    desc: "A living profile every agent reads and writes — skills, goals, learning, wellbeing, leave. It updates visibly as Sakha takes action.",
+    desc: "A living profile every agent reads and writes — skills, goals, learning, KPPs, wellbeing, leave. It updates visibly as Sakha takes action, so the demo shows memory living in the data, not the agent.",
     accent: "cyan",
   },
   {
-    icon: LayoutDashboard,
-    title: "Manager Copilot",
-    desc: "Weekly team intelligence — health trend, attrition risk, onboarding trackers, and certifications, each with a suggested next step.",
-    accent: "blue",
-  },
-  {
-    icon: Bell,
-    title: "Proactive Notifications",
-    desc: "Sakha reaches out first — welcome checklists, Day-1 unblockers, and wellbeing check-ins — before friction is ever felt.",
+    icon: Bot,
+    title: "Six-Agent Fabric",
+    desc: "Sakha is not one chatbot. Six named agents — Career, Learning, Opportunity, Workforce, Manager, and Wellbeing — reason over the Twin, act, and hand off across personas on one unified live timeline.",
     accent: "orange",
   },
   {
     icon: ShieldCheck,
-    title: "Human-in-the-Loop Governance",
-    desc: "Every action carries an autonomy badge — autonomous, consented, or needs approval — and is logged to the audit trail.",
+    title: "Autopilot & Governance",
+    desc: "Engage Autopilot and the Action Console plays actions queued → running → done, writing artifacts back to the Twin. Every action carries an autonomy badge — autonomous, consented, or needs approval — and is logged to the audit trail.",
     accent: "pink",
   },
 ];
 
-const LOOP = [
-  { icon: HeartPulse, label: "Observe", desc: "Signals across the lifecycle" },
-  { icon: Sparkles, label: "Reason", desc: "Against the Digital Twin" },
-  { icon: BriefcaseBusiness, label: "Act", desc: "Tickets, enrolments, nudges" },
-  { icon: GraduationCap, label: "Learn", desc: "Write back, get sharper" },
+const ICON_FOR: Record<AgentId, typeof Compass> = {
+  career: Compass,
+  learning: GraduationCap,
+  opportunity: BriefcaseBusiness,
+  workforce: Network,
+  manager: LayoutDashboard,
+  wellbeing: HeartPulse,
+};
+
+const OUTCOMES = [
+  { stat: "38% → 89%", label: "Priya's readiness over a 90-day plan" },
+  { stat: "84%", label: "Success probability to AI Delivery Manager" },
+  { stat: "₹35.5 Cr", label: "Reskill saving vs external hiring" },
+  { stat: "92 vs 38", label: "AI / GenAI demand vs supply" },
 ];
 
 export default function Home() {
@@ -243,7 +253,7 @@ export default function Home() {
         id="features"
         eyebrow="The product"
         title="Key capabilities"
-        subtitle="A three-agent MVP — Onboarding, Career GPS, and HR & Benefits — over a shared Employee Digital Twin."
+        subtitle="Three connected workspaces — Career GPS, Manager Copilot, and Workforce Intelligence — and a six-agent fabric, all over one shared Employee Digital Twin."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => {
@@ -268,26 +278,27 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* AGENTIC LOOP */}
+      {/* SIX-AGENT FABRIC */}
       <Section
-        eyebrow="How it works"
-        title="Stateless agents. A persistent Digital Twin."
-        subtitle="Agents spin up on demand, reason over the Twin, act, write back, and terminate. The memory lives in the data — not the agent."
+        eyebrow="The agent fabric"
+        title="Six agents. One Digital Twin."
+        subtitle="Sakha is not one chatbot. Six cooperating agents spin up on demand, reason over the Twin, act, write back, and hand off — the memory lives in the data, not the agent."
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {LOOP.map((l, i) => {
-            const Icon = l.icon;
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {agentList.map((a, i) => {
+            const Icon = ICON_FOR[a.id];
             return (
-              <Reveal key={l.label} delay={i * 0.06}>
+              <Reveal key={a.id} delay={i * 0.05}>
                 <div className="surface flex h-full items-start gap-3 p-5">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--card-hover)] text-[var(--ai-cyan)]">
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    style={{ background: accentRgba(a.accent, 0.16), color: ACCENT_HEX[a.accent] }}
+                  >
                     <Icon className="h-4 w-4" />
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-[var(--text-primary)]">
-                      {i + 1}. {l.label}
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{l.desc}</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{a.name}</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{a.remit}</p>
                   </div>
                 </div>
               </Reveal>
@@ -295,6 +306,20 @@ export default function Home() {
           })}
         </div>
       </Section>
+
+      {/* OUTCOMES STRIP */}
+      <section className="mx-auto max-w-6xl px-5 pb-4">
+        <Reveal>
+          <div className="surface grid gap-px overflow-hidden sm:grid-cols-4">
+            {OUTCOMES.map((o) => (
+              <div key={o.label} className="p-5 text-center">
+                <p className="brand-text text-2xl font-bold sm:text-3xl">{o.stat}</p>
+                <p className="mt-1.5 text-xs leading-5 text-[var(--text-secondary)]">{o.label}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </section>
 
       {/* CTA BAND */}
       <section className="mx-auto max-w-6xl px-5 pb-16">
@@ -333,9 +358,9 @@ export default function Home() {
 
 function HeroPreview() {
   const roadmap = [
-    { icon: BookOpen, label: "Learn EU AI Act" },
-    { icon: GraduationCap, label: "Certification" },
-    { icon: Rocket, label: "Governance project" },
+    { icon: GraduationCap, label: "AI Delivery Foundations" },
+    { icon: CheckCircle2, label: "Azure AI-900" },
+    { icon: Rocket, label: "AI Studio shadow" },
   ];
   return (
     <motion.div
@@ -362,16 +387,16 @@ function HeroPreview() {
 
       <div className="grid gap-5 p-5 text-left sm:grid-cols-[auto_1fr] sm:items-center">
         <div className="flex items-center gap-4">
-          <PreviewRing value={72} />
+          <PreviewRing value={38} />
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
               Your destination
             </p>
-            <p className="text-lg font-bold text-[var(--text-primary)]">AI Governance Consultant</p>
+            <p className="text-lg font-bold text-[var(--text-primary)]">AI Delivery Manager</p>
             <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-              Senior QA Engineer
+              Delivery Manager
               <ArrowRight className="h-3 w-3 text-[var(--ai-purple)]" />
-              Governance
+              AI Delivery
             </p>
           </div>
         </div>
@@ -382,8 +407,8 @@ function HeroPreview() {
             style={{ borderColor: accentRgba("cyan", 0.4), background: accentRgba("cyan", 0.08) }}
           >
             <Sparkles className="mr-1.5 inline h-3.5 w-3.5 text-[var(--ai-cyan)]" />
-            <span className="font-semibold text-[var(--ai-cyan)]">88% probability</span> of reaching
-            this role within 3 months.
+            <span className="font-semibold text-[var(--ai-cyan)]">84% probability</span> of reaching
+            this role within 90 days.
           </div>
 
           <div className="flex flex-wrap gap-1.5">
@@ -402,7 +427,7 @@ function HeroPreview() {
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-[var(--text-secondary)]">
-            {["Course enrolled", "Calendar blocked", "Mentor suggested"].map((a) => (
+            {["Course enrolled", "5 hrs/week blocked", "Mentor matched"].map((a) => (
               <span key={a} className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5 text-[var(--ai-cyan)]" />
                 {a}
