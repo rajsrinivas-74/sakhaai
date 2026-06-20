@@ -6,6 +6,7 @@ import { ACCENT_HEX, accentRgba } from "@/lib/accents";
 
 const STATUS_LABEL: Record<AgentStatus, string> = {
   idle: "idle",
+  watching: "watching",
   thinking: "thinking",
   acting: "acting",
   done: "done",
@@ -24,7 +25,10 @@ export function AgentChip({
 }) {
   const def = agentById(agent);
   const color = ACCENT_HEX[def.accent];
+  // "live" = actively working → urgent ping. "watching" = always-on monitoring
+  // → a calm, slow breathe, never the busy pulse.
   const live = status === "thinking" || status === "acting" || status === "handoff";
+  const watching = status === "watching";
 
   return (
     <span
@@ -39,7 +43,10 @@ export function AgentChip({
             style={{ background: color }}
           />
         )}
-        <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: color }} />
+        <span
+          className={`relative inline-flex h-2 w-2 rounded-full ${watching ? "animate-pulse" : ""}`}
+          style={{ background: color }}
+        />
       </span>
       {def.name}
       {status !== "idle" && (

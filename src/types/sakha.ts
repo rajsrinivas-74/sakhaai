@@ -324,7 +324,7 @@ export type AgentDef = {
   accent: "blue" | "purple" | "cyan" | "pink" | "orange";
 };
 
-export type AgentStatus = "idle" | "thinking" | "acting" | "done" | "handoff";
+export type AgentStatus = "idle" | "watching" | "thinking" | "acting" | "done" | "handoff";
 
 /** One entry in the live agent activity stream / unified timeline. */
 export type AgentEvent = {

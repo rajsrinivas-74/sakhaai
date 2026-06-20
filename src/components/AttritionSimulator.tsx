@@ -85,7 +85,7 @@ export function AttritionSimulator() {
           <ShieldAlert className="h-4 w-4 text-[var(--ai-pink)]" />
           Attrition what-if · Rajan Krishnan
         </div>
-        <AgentChip agent="wellbeing" status={applied ? "acting" : "thinking"} />
+        <AgentChip agent="wellbeing" status={applied ? "acting" : "watching"} />
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-[150px_1fr] sm:items-center">

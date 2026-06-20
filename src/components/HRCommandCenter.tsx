@@ -180,7 +180,7 @@ export function HRCommandCenter({
             <span className="font-bold text-[var(--ai-cyan)]">{retentionIntel.retainable}</span> retainable via{" "}
             {retentionIntel.lever.toLowerCase()}
           </p>
-          <AgentChip agent="wellbeing" status="thinking" />
+          <AgentChip agent="wellbeing" status="watching" />
         </div>
 
         {/* HERO BRIEFING */}
@@ -342,7 +342,7 @@ function AiDeliveryManagerCase({ onAct }: { onAct: (d: AgentDraft) => void }) {
           <TrendingUp className="h-4 w-4 text-[var(--ai-purple)]" />
           AI Delivery Manager · build vs buy
         </div>
-        <AgentChip agent="workforce" status="thinking" />
+        <AgentChip agent="workforce" status="watching" />
       </div>
       <p className="mt-1 text-xs text-[var(--text-secondary)]">
         Priya&rsquo;s move surfaced <span className="font-semibold text-[var(--text-primary)]">{e.cohortSize} delivery managers</span> with the same

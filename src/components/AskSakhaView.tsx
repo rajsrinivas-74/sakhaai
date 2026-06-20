@@ -27,7 +27,7 @@ export function AskSakhaView({ role }: { role: "manager" | "hr" }) {
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Ask Sakha</h2>
           <p className="text-xs text-[var(--text-secondary)]">Natural-language answers about {scope}</p>
         </div>
-        <AgentChip agent={agent} status="thinking" />
+        <AgentChip agent={agent} status="watching" />
       </header>
 
       <div className="thin-scroll flex-1 overflow-y-auto p-6">

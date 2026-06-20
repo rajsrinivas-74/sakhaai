@@ -32,7 +32,7 @@ export function ManagerWhatIf() {
           <Zap className="h-4 w-4 text-[var(--ai-cyan)]" />
           What if I approve the AI Upskilling Program?
         </div>
-        <AgentChip agent="manager" status={approved ? "acting" : "thinking"} />
+        <AgentChip agent="manager" status={approved ? "acting" : "watching"} />
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">

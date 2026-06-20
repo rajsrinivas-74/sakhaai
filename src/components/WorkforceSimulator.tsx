@@ -59,7 +59,7 @@ export function WorkforceSimulator() {
           <Zap className="h-4 w-4 text-[var(--ai-blue)]" />
           Reskilling simulator
         </div>
-        <AgentChip agent="workforce" status={approved ? "acting" : "thinking"} />
+        <AgentChip agent="workforce" status={approved ? "acting" : "watching"} />
       </div>
       <p className="mt-1 text-xs text-[var(--text-secondary)]">
         Close the AI capability gap with internal talent — not external hiring.

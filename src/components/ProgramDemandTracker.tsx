@@ -31,7 +31,7 @@ export function ProgramDemandTracker({ onAct }: { onAct: (d: AgentDraft) => void
           Program demand tracker
           <span className="text-[11px] font-normal text-[var(--text-muted)]">· skill demand → fulfilment</span>
         </div>
-        <AgentChip agent="workforce" status="thinking" />
+        <AgentChip agent="workforce" status="watching" />
       </div>
 
       <div className="mt-4 space-y-2.5">
