@@ -20,50 +20,71 @@ export type TourStep = {
   dwell: number;
 };
 
-/** The cross-persona golden thread, step by step — narration names the agents
- * at work so the agentic nature is explicit. Dwell times total ~5 minutes for
- * a hands-free run; a presenter can always click Next to move faster. */
+/** The cross-persona golden thread — dashboard-first per persona, narration
+ * names the agents at work. Dwell times total ~5 minutes for a hands-free run;
+ * a presenter can always click Next to move faster. */
 export const TOUR: TourStep[] = [
+  // ── PRIYA ─────────────────────────────────────────────
+  {
+    actor: "priya", view: "emp-overview", lens: "Employee · Priya", title: "Priya’s dashboard",
+    caption: "Start where Priya starts: performance, growth, learning and opportunities in one place — the evidence Sakha reasons over.",
+    detail: "AGENTS: the fleet has already assembled her Digital Twin before she asks a thing.",
+    dwell: 20000,
+  },
   {
     actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks",
-    caption: "Sakha is a fleet of agents, not a chatbot. It speaks first, then Priya asks: “How do I move into AI Delivery Management?”",
-    detail: "AGENTS: the fabric is already watching her lifecycle — she just asks in plain language.",
-    dwell: 35000,
+    caption: "She asks a specific question — which career to target to move into AI Delivery Management.",
+    detail: "AGENTS: Sakha is a fleet, not a chatbot — it answers from her Twin and KPPs, not a script.",
+    dwell: 28000,
   },
   {
     actor: "priya", view: "career", lens: "Employee · Priya", title: "Agents reason — live",
-    caption: "Six agents wake up: the Career Agent reads her Digital Twin, then hands off to the Learning, Opportunity and Workforce agents.",
-    detail: "AGENTS AT WORK: watch the reasoning stream — every line is a different agent. Career → gap analysis, Learning → courses, Opportunity → internal roles, Workforce → org demand.",
-    dwell: 60000,
+    caption: "Six agents wake up: the Career Agent reads her Twin, then hands off to Learning, Opportunity and Workforce.",
+    detail: "AGENTS AT WORK: every reasoning line is a different agent — Career → gaps, Learning → courses, Opportunity → roles, Workforce → org demand.",
+    dwell: 50000,
   },
   {
     actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Grounded, not guessed",
-    caption: "The Career Agent didn’t invent gaps — it grounded every one in Priya’s real KPP appraisal and Vikram’s manager feedback.",
-    detail: "AGENT EVIDENCE: margin-miss → commercial gap; the manager’s flagged areas become the GPS gaps. The ‘Manager feedback · considered by GPS’ card proves it.",
-    dwell: 48000,
+    caption: "The Career Agent grounded every gap in Priya’s real KPP appraisal and Vikram’s manager feedback.",
+    detail: "AGENT EVIDENCE: margin-miss → commercial gap; the manager’s flagged areas become the GPS gaps.",
+    dwell: 42000,
+  },
+  // ── VIKRAM ────────────────────────────────────────────
+  {
+    actor: "vikram", view: "mgr-overview", lens: "Manager · Vikram", title: "Manager’s dashboard",
+    caption: "Same moment, a different lens. Vikram opens to team health and readiness first.",
+    detail: "AGENTS: the Manager Agent surfaced Priya’s move to his board — he didn’t go looking.",
+    dwell: 22000,
   },
   {
-    actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Agents push to the manager",
-    caption: "The Manager Agent surfaced Priya to Vikram unprompted, while the Wellbeing Agent flagged Rajan’s burnout.",
-    detail: "AGENTS: we switched user to Vikram — no email. The Manager & Wellbeing agents pushed exactly what he needs to act on, with a human-approval gate.",
+    actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Ready, and the gap",
+    caption: "Priya in his spotlight — the same readiness she sees, plus the drafted action to assign her to AI Studio.",
+    detail: "AGENTS: the Manager Agent ranks readiness; the Wellbeing Agent flags Rajan’s burnout right beside it.",
     dwell: 42000,
   },
   {
     actor: "vikram", view: "mgr-performance", lens: "Manager · Vikram", title: "Agents connect the dots",
-    caption: "The Manager Agent rolled Priya’s margin gap into Vikram’s own KPP — and Rajan’s Wellbeing signal shows up as a margin cost.",
-    detail: "AGENTIC INSIGHT: the agents link a junior’s over-utilisation to a senior’s margin miss — a connection no static dashboard would make.",
-    dwell: 48000,
+    caption: "Her margin gap rolls into Vikram’s own KPP — and Rajan’s utilisation shows up as a margin cost.",
+    detail: "AGENTIC INSIGHT: a junior’s over-utilisation explains a senior’s margin miss — no static dashboard joins that.",
+    dwell: 40000,
+  },
+  // ── ANITA ─────────────────────────────────────────────
+  {
+    actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "Workforce dashboard",
+    caption: "Now zoom all the way out. Anita opens to demand vs supply across the workforce.",
+    detail: "AGENTS: the Workforce Agent keeps org demand and supply live as commitments land.",
+    dwell: 22000,
   },
   {
     actor: "anita", view: "hr-buildbuy", lens: "Capability · Anita", title: "One move fans out",
-    caption: "The Workforce Agent found 23 look-alikes to Priya and the Opportunity Agent matched them — a ₹13.9 Cr build-vs-buy case.",
-    detail: "AGENTS SCALE IT: switched to Anita. One employee commitment fans out — Workforce Agent sizes the cohort, Opportunity Agent matches the talent.",
-    dwell: 52000,
+    caption: "Priya’s move surfaced 23 look-alikes — reskill them and supply goes 3 → 19, ₹13.9 Cr saved vs hiring.",
+    detail: "AGENTS SCALE IT: the Workforce Agent sizes the cohort, the Opportunity Agent matches the talent.",
+    dwell: 44000,
   },
   {
-    actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "The fleet closes the thread",
-    caption: "One Digital Twin, six agents, three lenses — an employee goal becomes workforce transformation.",
-    detail: "THE FLEET: Career, Learning, Opportunity, Workforce, Manager and Wellbeing agents all worked a single event across all three views.",
+    actor: "anita", view: "hr-talent", lens: "Capability · Anita", title: "Retention, not just supply",
+    caption: "The fleet closes the thread: people inside HCLTech see a path, stay, and move to where demand is.",
+    detail: "THE FLEET: Career, Learning, Opportunity, Workforce, Manager, Wellbeing — one event, three lenses.",
     dwell: 8000,
   },
 ];

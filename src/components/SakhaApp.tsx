@@ -153,8 +153,8 @@ export function SakhaApp({
                       twin={twin}
                       onNavigateCareer={navigateCareer}
                       autoAsk={
-                        tourStep === 0 && twin.id === "priya"
-                          ? "How do I move into AI Delivery Management?"
+                        tourStep != null && twin.id === "priya"
+                          ? "Which specific career should I target next to move into AI Delivery Management?"
                           : undefined
                       }
                     />

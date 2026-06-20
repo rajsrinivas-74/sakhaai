@@ -21,18 +21,26 @@ Say: "Every enterprise says invest in your people. But employees do not get a ro
 
 Meet Sakha — an agentic Employee Success OS. One Digital Twin, six agents, three connected views. And critically, it reasons over real performance data — appraisal KPPs and manager feedback — not a generic skills quiz. Let me show you with a real employee: Priya, a Delivery Manager who wants to lead AI delivery."
 
-Click into Priya's view.
+Click into Priya's dashboard first.
 
 ---
 
 ## ACT 1 — Employee: KPP-Grounded Career GPS (2 min). THE CORE.
 
-Priya gets a proactive nudge. Open the chat.
+Start on Priya's dashboard. Walk the room through what is visible before asking anything.
 
-Say: "Sakha speaks first — it already knows Priya's context. Watch what happens when she asks the question every employee is afraid to ask."
+Say: "Here is Priya's performance, growth, learning, and opportunity picture all in one place. This is not just a chat demo; Sakha starts from the dashboard and the live evidence behind it."
+
+Point at performance, growth, learning, and opportunity signals.
+
+Say: "You can see her KPPs, her growth signals, what she is learning now, and which opportunities are open to her. That is the context Sakha uses before she ever answers a career question."
+
+Open the chat.
+
+Say: "Sakha speaks first — it already knows Priya's context. Watch what happens when she asks a specific career question."
 
 Type in chat:
-How do I move into AI Delivery Management?
+Which specific career should I target next to move into AI Delivery Management?
 
 Career GPS opens. Narrate the reasoning stream as it appears.
 
@@ -72,7 +80,7 @@ Say: "A roadmap is nice. Sakha acts on it."
 
 Pick target role, set hours per week, click Enable Career Autopilot.
 
-Say: "She commits five hours a week. The agents enroll her, block her calendar, and flag her up the chain. One employee action just rippled to two other people. Watch."
+Say: "She commits five hours a week. The agents enroll her, block her calendar, and flag her up the chain. Enable Autopilot before we switch to the manager view. One employee action just rippled to two other people. Watch."
 
 ---
 
@@ -80,7 +88,11 @@ Say: "She commits five hours a week. The agents enroll her, block her calendar, 
 
 Switch user to Manager, Vikram.
 
-Say: "Same moment, different lens. Vikram is a Senior Delivery Director. He did not get an email — Sakha surfaced it."
+Say: "Open Vikram's dashboard first. Same moment, different lens. Vikram is a Senior Delivery Director. He did not get an email — Sakha surfaced it."
+
+Point at team readiness.
+
+Say: "Team readiness is the first thing he sees, so he knows where the team stands before he drills into any individual."
 
 Point at the Employee spotlight.
 
@@ -100,11 +112,15 @@ Say: "And it caught what he would miss. Rajan — 8 late nights, engagement down
 
 Switch user to HR, Anita, Chief People Officer.
 
-Say: "Now zoom all the way out. Anita runs workforce strategy."
+Say: "Open Anita's dashboard first. Now zoom all the way out. Anita runs workforce strategy."
 
-Point at the workforce gap map.
+Point at workforce intelligence demand and supply.
 
 Say: "AI Delivery Managers — demand 12, supply 3. A nine-role gap most companies fix by hiring expensively."
+
+Point at the approved fill plan.
+
+Say: "This is the fill plan Sakha recommends and Anita can approve. It turns Priya's signal into a cohort plan instead of a one-off decision."
 
 Point at the AI Delivery Manager build-versus-buy card.
 
@@ -113,6 +129,10 @@ Say: "But look. Priya's one move surfaced 23 delivery managers with the exact sa
 Point at the reskilling simulator and forecast.
 
 Say: "And she can model it live — drag the cohort, watch the gap close and the rupees saved compute in real time."
+
+End with talent retention.
+
+Say: "And the outcome is not just supply. It is talent retention too — the people already inside HCLTech see a path, stay engaged, and move into the demand the business actually needs."
 
 ---
 
