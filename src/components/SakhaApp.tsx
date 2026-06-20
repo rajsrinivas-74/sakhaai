@@ -49,6 +49,7 @@ export function SakhaApp({
   const [gpsResult, setGpsResult] = useState<CareerGpsResult | undefined>(undefined);
   const [twinUpdated, setTwinUpdated] = useState("on load");
   const [twinOpen, setTwinOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [notif, setNotif] = useState<Notif | null>(null);
   const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -94,13 +95,13 @@ export function SakhaApp({
   return (
     <div className="app-ambient min-h-screen p-3 pb-20 sm:p-4 sm:pb-20 xl:pb-4">
       <div className="mx-auto grid max-w-[1600px] gap-4 lg:h-[calc(100vh-2rem-64px)] lg:grid-cols-[240px_1fr] xl:h-[calc(100vh-2rem)]">
-        {/* Mobile: compact top bar */}
+        {/* Mobile: compact top bar with hamburger */}
         <div className="lg:hidden">
           <MobileBar
             role={role}
             twin={twin}
             view={view}
-            onView={navView}
+            onOpenMenu={() => setMenuOpen(true)}
             onOpenTwin={() => setTwinOpen(true)}
           />
         </div>
@@ -169,6 +170,37 @@ export function SakhaApp({
       <div className="xl:hidden">
         <AgentDock />
       </div>
+
+      {/* Mobile-only nav drawer — the full Sidebar slides in from the left */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 lg:hidden"
+          >
+            <div className="absolute inset-0 bg-black/60" onClick={() => setMenuOpen(false)} />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              className="absolute left-0 top-0 h-full w-[84%] max-w-xs p-3"
+            >
+              <Sidebar
+                role={role}
+                twin={twin}
+                view={view}
+                onView={(v) => {
+                  navView(v);
+                  setMenuOpen(false);
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile-only Digital Twin slide-over */}
       <AnimatePresence>

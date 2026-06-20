@@ -11,6 +11,7 @@ import {
   Layers,
   LineChart,
   LogOut,
+  Menu,
   MessageCircle,
   MessagesSquare,
   Network,
@@ -234,73 +235,58 @@ function SubButton({ item, accent, active, onClick }: { item: SubItem; accent: A
   );
 }
 
-/* ── Mobile top bar (below lg) ─────────────────────────────────────────── */
+/* ── Mobile top bar (below lg) — hamburger opens the drawer ─────────────── */
 export function MobileBar({
   role,
   twin,
   view,
-  onView,
+  onOpenMenu,
   onOpenTwin,
 }: {
   role: Role;
   twin: EmployeeTwin | null;
   view: View;
-  onView: (v: View) => void;
+  onOpenMenu: () => void;
   onOpenTwin: () => void;
 }) {
   const identity = getIdentity(role, twin);
   const group = NAV_FOR[role];
+  const current = group.items.find((i) => i.id === view);
   const isEmployee = role === "employee";
 
   return (
-    <div className="surface flex flex-col gap-2.5 p-2.5" style={{ background: "var(--sidebar)" }}>
-      <div className="flex items-center gap-2.5">
-        <Link href="/" className="flex shrink-0 items-center">
-          <SakhaLogo className="h-8 w-auto" />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{identity.name}</p>
-          <p className="truncate text-[11px] text-[var(--text-secondary)]">{group.feature}</p>
-        </div>
-        {isEmployee && twin && (
-          <button
-            onClick={onOpenTwin}
-            className="surface-hover inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-2 text-xs font-medium text-[var(--text-secondary)]"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-[var(--ai-cyan)]" />
-            Twin
-          </button>
-        )}
-        <Link
-          href="/"
-          aria-label="Switch user"
-          className="surface-hover flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)]"
+    <div className="surface flex items-center gap-2.5 p-2.5" style={{ background: "var(--sidebar)" }}>
+      <button
+        onClick={onOpenMenu}
+        aria-label="Open menu"
+        className="surface-hover flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border"
+        style={{ borderColor: accentRgba(group.accent, 0.5), color: ACCENT_HEX[group.accent] }}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{identity.name}</p>
+        <p className="truncate text-[11px] text-[var(--text-secondary)]">
+          {group.feature}
+          {current ? ` · ${current.label}` : ""}
+        </p>
+      </div>
+      {isEmployee && twin && (
+        <button
+          onClick={onOpenTwin}
+          className="surface-hover inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-2 text-xs font-medium text-[var(--text-secondary)]"
         >
-          <LogOut className="h-4 w-4" />
-        </Link>
-      </div>
-
-      <div className="thin-scroll flex gap-1.5 overflow-x-auto pb-1">
-        {group.items.map((item) => {
-          const active = view === item.id;
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onView(item.id)}
-              className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold"
-              style={{
-                color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                background: active ? accentRgba(group.accent, 0.14) : "var(--card)",
-                border: `1px solid ${active ? accentRgba(group.accent, 0.5) : "var(--border)"}`,
-              }}
-            >
-              <Icon className="h-3.5 w-3.5" style={{ color: active ? ACCENT_HEX[group.accent] : "currentColor" }} />
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+          <Sparkles className="h-3.5 w-3.5 text-[var(--ai-cyan)]" />
+          Twin
+        </button>
+      )}
+      <Link
+        href="/"
+        aria-label="Switch user"
+        className="surface-hover flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-secondary)]"
+      >
+        <LogOut className="h-4 w-4" />
+      </Link>
     </div>
   );
 }

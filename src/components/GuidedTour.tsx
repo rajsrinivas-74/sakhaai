@@ -20,15 +20,52 @@ export type TourStep = {
   dwell: number;
 };
 
-/** The cross-persona golden thread, step by step. */
+/** The cross-persona golden thread, step by step — narration names the agents
+ * at work so the agentic nature is explicit. Dwell times total ~5 minutes for
+ * a hands-free run; a presenter can always click Next to move faster. */
 export const TOUR: TourStep[] = [
-  { actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks", caption: "“How do I move into AI Delivery Management?” — the question every employee is afraid to ask.", detail: "Sakha greets Priya and surfaces her saved goal, then she asks in plain language.", dwell: 6500 },
-  { actor: "priya", view: "career", lens: "Employee · Priya", title: "Career GPS", caption: "Sakha maps a 90-day path — 38% ready today, reasoned live over her Digital Twin.", detail: "Six agents wake up and stream their reasoning; the roadmap, gaps and roles assemble live.", dwell: 9500 },
-  { actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "The evidence", caption: "Her real appraisal: revenue strength, a margin gap, and Vikram’s feedback — what the GPS reasoned over.", detail: "Notice the KPP scorecard and the ‘Manager feedback · considered by GPS’ card — gaps are evidence-backed.", dwell: 8000 },
-  { actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Manager sees it", caption: "Priya appears in Vikram’s spotlight — same promotion readiness + KPP evidence, surfaced without an email.", detail: "We just switched user to Vikram. He didn’t go looking — Sakha propagated Priya’s move to his board.", dwell: 7500 },
-  { actor: "vikram", view: "mgr-performance", lens: "Manager · Vikram", title: "Manager’s own KPP", caption: "Her margin gap rolls into Vikram’s margin KPP — backing her growth also fixes his number.", detail: "The margin bridge shows Priya’s −0.4 Cr and Rajan’s over-utilisation feeding his own scorecard.", dwell: 8000 },
-  { actor: "anita", view: "hr-buildbuy", lens: "Capability · Anita", title: "Workforce impact", caption: "Priya’s one move surfaces 23 delivery managers like her — ₹13.9 Cr saved vs hiring.", detail: "Switched to Anita. One employee’s ambition becomes an org-level reskilling cohort and a build-vs-buy case.", dwell: 8000 },
-  { actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "The thread closes", caption: "One Digital Twin, three lenses. Employee goal → workforce transformation.", detail: "Same event, three altitudes: Priya’s KPP → Vikram’s margin → Anita’s capability gap.", dwell: 7000 },
+  {
+    actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks",
+    caption: "Sakha is a fleet of agents, not a chatbot. It speaks first, then Priya asks: “How do I move into AI Delivery Management?”",
+    detail: "AGENTS: the fabric is already watching her lifecycle — she just asks in plain language.",
+    dwell: 35000,
+  },
+  {
+    actor: "priya", view: "career", lens: "Employee · Priya", title: "Agents reason — live",
+    caption: "Six agents wake up: the Career Agent reads her Digital Twin, then hands off to the Learning, Opportunity and Workforce agents.",
+    detail: "AGENTS AT WORK: watch the reasoning stream — every line is a different agent. Career → gap analysis, Learning → courses, Opportunity → internal roles, Workforce → org demand.",
+    dwell: 60000,
+  },
+  {
+    actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Grounded, not guessed",
+    caption: "The Career Agent didn’t invent gaps — it grounded every one in Priya’s real KPP appraisal and Vikram’s manager feedback.",
+    detail: "AGENT EVIDENCE: margin-miss → commercial gap; the manager’s flagged areas become the GPS gaps. The ‘Manager feedback · considered by GPS’ card proves it.",
+    dwell: 48000,
+  },
+  {
+    actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Agents push to the manager",
+    caption: "The Manager Agent surfaced Priya to Vikram unprompted, while the Wellbeing Agent flagged Rajan’s burnout.",
+    detail: "AGENTS: we switched user to Vikram — no email. The Manager & Wellbeing agents pushed exactly what he needs to act on, with a human-approval gate.",
+    dwell: 42000,
+  },
+  {
+    actor: "vikram", view: "mgr-performance", lens: "Manager · Vikram", title: "Agents connect the dots",
+    caption: "The Manager Agent rolled Priya’s margin gap into Vikram’s own KPP — and Rajan’s Wellbeing signal shows up as a margin cost.",
+    detail: "AGENTIC INSIGHT: the agents link a junior’s over-utilisation to a senior’s margin miss — a connection no static dashboard would make.",
+    dwell: 48000,
+  },
+  {
+    actor: "anita", view: "hr-buildbuy", lens: "Capability · Anita", title: "One move fans out",
+    caption: "The Workforce Agent found 23 look-alikes to Priya and the Opportunity Agent matched them — a ₹13.9 Cr build-vs-buy case.",
+    detail: "AGENTS SCALE IT: switched to Anita. One employee commitment fans out — Workforce Agent sizes the cohort, Opportunity Agent matches the talent.",
+    dwell: 52000,
+  },
+  {
+    actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "The fleet closes the thread",
+    caption: "One Digital Twin, six agents, three lenses — an employee goal becomes workforce transformation.",
+    detail: "THE FLEET: Career, Learning, Opportunity, Workforce, Manager and Wellbeing agents all worked a single event across all three views.",
+    dwell: 8000,
+  },
 ];
 
 function base(actor: TourActor): string {
