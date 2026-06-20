@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -38,10 +38,13 @@ export function MissionControl({
   twin,
   goal,
   result,
+  autoEngage = false,
 }: {
   twin: EmployeeTwin;
   goal: string;
   result: CareerGpsResult;
+  /** During the guided demo, auto-engage Autopilot so the agents visibly act. */
+  autoEngage?: boolean;
 }) {
   const mission: Mission =
     twin.mission && twin.mission.title.toLowerCase() === goal.toLowerCase()
@@ -99,6 +102,17 @@ export function MissionControl({
       setEngaging(false);
     }
   }
+
+  // Guided demo: auto-click Engage so the agents visibly act before the
+  // walkthrough switches to the manager/HR lenses.
+  const autoEngagedOnce = useRef(false);
+  useEffect(() => {
+    if (!autoEngage || autoEngagedOnce.current) return;
+    autoEngagedOnce.current = true;
+    const t = setTimeout(() => void engage(), 1800);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoEngage]);
 
   const keyActions: ActionItem[] = [
     {

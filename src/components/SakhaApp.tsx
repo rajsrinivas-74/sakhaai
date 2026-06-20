@@ -14,7 +14,7 @@ import {
   EmployeeGrowth,
   EmployeeOpportunities,
 } from "@/components/EmployeePages";
-import { GuidedTour, StartTourButton } from "@/components/GuidedTour";
+import { GuidedTour, StartTourButton, tourStepEngages } from "@/components/GuidedTour";
 import { DigitalTwin } from "@/components/DigitalTwin";
 import { AgentDock } from "@/components/AgentDock";
 import { LiveRail } from "@/components/LiveRail";
@@ -139,6 +139,7 @@ export function SakhaApp({
                       notif={notif}
                       onNotifAction={handleNotifAction}
                       onNotifDismiss={() => setNotif(null)}
+                      autoEngage={tourStepEngages(tourStep)}
                     />
                   ) : view === "emp-performance" ? (
                     <EmployeePerformance twin={twin} />

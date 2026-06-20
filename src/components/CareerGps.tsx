@@ -27,6 +27,7 @@ export function CareerGps({
   notif,
   onNotifAction,
   onNotifDismiss,
+  autoEngage = false,
 }: {
   twin: EmployeeTwin;
   prefillGoal?: string | null;
@@ -34,6 +35,8 @@ export function CareerGps({
   notif?: NotifType | null;
   onNotifAction?: (label: string) => void;
   onNotifDismiss?: () => void;
+  /** Forwarded to Mission Control to auto-engage Autopilot during the demo. */
+  autoEngage?: boolean;
 }) {
   const [goal, setGoal] = useState(prefillGoal || twin.careerGoal);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -259,7 +262,7 @@ export function CareerGps({
           )}
 
           {phase === "results" && result && (
-            <MissionControl key="results" twin={twin} goal={goal} result={result} />
+            <MissionControl key="results" twin={twin} goal={goal} result={result} autoEngage={autoEngage} />
           )}
         </AnimatePresence>
       </div>

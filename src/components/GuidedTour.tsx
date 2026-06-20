@@ -18,7 +18,14 @@ export type TourStep = {
   detail: string;
   /** Dwell time (ms) before auto-advancing to the next step. */
   dwell: number;
+  /** When true, the Career GPS result auto-engages Autopilot on this step. */
+  engage?: boolean;
 };
+
+/** Does the given tour step auto-engage Career Autopilot? */
+export function tourStepEngages(step: number | undefined): boolean {
+  return step != null && TOUR[step]?.engage === true;
+}
 
 /** The cross-persona golden thread — dashboard-first per persona, narration
  * names the agents at work. Dwell times total ~5 minutes for a hands-free run;
@@ -27,27 +34,39 @@ export const TOUR: TourStep[] = [
   // ── PRIYA ─────────────────────────────────────────────
   {
     actor: "priya", view: "emp-overview", lens: "Employee · Priya", title: "Priya’s dashboard",
-    caption: "Start where Priya starts: performance, growth, learning and opportunities in one place — the evidence Sakha reasons over.",
+    caption: "Start where Priya starts — her workspace and the signals Sakha reasons over.",
     detail: "AGENTS: the fleet has already assembled her Digital Twin before she asks a thing.",
-    dwell: 20000,
+    dwell: 18000,
+  },
+  {
+    actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Performance evidence",
+    caption: "Her real KPP appraisal and Vikram’s feedback — the evidence behind every recommendation.",
+    detail: "AGENT EVIDENCE: revenue strength, the margin miss, DEI — the Career Agent reads all of it.",
+    dwell: 36000,
+  },
+  {
+    actor: "priya", view: "emp-growth", lens: "Employee · Priya", title: "Growth & learning",
+    caption: "What she’s learning now and the tracks the agents recommend toward her goal.",
+    detail: "AGENTS: the Learning Agent sequences courses and reserves calendar time.",
+    dwell: 24000,
   },
   {
     actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks",
     caption: "She asks a specific question — which career to target to move into AI Delivery Management.",
     detail: "AGENTS: Sakha is a fleet, not a chatbot — it answers from her Twin and KPPs, not a script.",
-    dwell: 28000,
+    dwell: 26000,
   },
   {
     actor: "priya", view: "career", lens: "Employee · Priya", title: "Agents reason — live",
     caption: "Six agents wake up: the Career Agent reads her Twin, then hands off to Learning, Opportunity and Workforce.",
     detail: "AGENTS AT WORK: every reasoning line is a different agent — Career → gaps, Learning → courses, Opportunity → roles, Workforce → org demand.",
-    dwell: 50000,
+    dwell: 46000,
   },
   {
-    actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Grounded, not guessed",
-    caption: "The Career Agent grounded every gap in Priya’s real KPP appraisal and Vikram’s manager feedback.",
-    detail: "AGENT EVIDENCE: margin-miss → commercial gap; the manager’s flagged areas become the GPS gaps.",
-    dwell: 42000,
+    actor: "priya", view: "career", lens: "Employee · Priya", title: "Enable Career Autopilot", engage: true,
+    caption: "She engages Autopilot — agents enroll her, block her calendar, and flag her up the chain.",
+    detail: "AGENTS ACT: one commitment ripples to her manager and to HR — watch the next two lenses.",
+    dwell: 30000,
   },
   // ── VIKRAM ────────────────────────────────────────────
   {
