@@ -13,6 +13,7 @@ import { resolveFallback } from "@/data/career-gps";
 import { ACCENT_HEX, accentRgba } from "@/lib/accents";
 import type { View } from "@/components/Sidebar";
 import { DrillCard } from "@/components/DrillCard";
+import { TourLaunch } from "@/components/GuidedTour";
 import { DreyfusBadge } from "@/components/DreyfusBadge";
 import { KppScorecard } from "@/components/KppScorecard";
 import { PromotionReadiness } from "@/components/PromotionReadiness";
@@ -54,6 +55,7 @@ export function EmployeeOverview({ twin, onView }: { twin: EmployeeTwin; onView:
   const gps = resolveFallback(twin.id, twin.careerGoal);
   return (
     <Panel title={`${twin.name}'s workspace`} subtitle={`Your Career GPS · goal: ${twin.careerGoal}`} icon={Compass}>
+      {twin.id === "priya" && <TourLaunch />}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <DrillCard icon={Target} label="Mission readiness" value={`${gps.matchPercentage}%`} sub={`${twin.careerGoal} · ${gps.readinessDays}d`} accent="purple" onOpen={() => onView("career")} />
         <DrillCard icon={MessageCircle} label="Ask Sakha" value="Chat" sub="career, leave, onboarding, HR" accent="blue" onOpen={() => onView("chat")} />

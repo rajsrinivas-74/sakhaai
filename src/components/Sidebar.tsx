@@ -96,7 +96,7 @@ export const NAV_FOR: Record<Role, NavGroup> = {
 
 /** Default landing section per role. Employee keeps Chat as the golden-path entry. */
 export const DEFAULT_VIEW: Record<Role, View> = {
-  employee: "chat",
+  employee: "emp-overview",
   manager: "mgr-overview",
   hr: "hr-overview",
 };

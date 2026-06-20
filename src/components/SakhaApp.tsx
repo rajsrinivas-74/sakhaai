@@ -29,10 +29,12 @@ export function SakhaApp({
   actor = "priya",
   initialView,
   tourStep,
+  tourAuto = false,
 }: {
   actor?: Actor;
   initialView?: View;
   tourStep?: number;
+  tourAuto?: boolean;
 } = {}) {
   const role: Role = actor === "vikram" ? "manager" : actor === "anita" ? "hr" : "employee";
   const isManager = role === "manager";
@@ -197,7 +199,11 @@ export function SakhaApp({
       </AnimatePresence>
 
       {/* Guided cross-persona walkthrough */}
-      {tourStep != null ? <GuidedTour step={tourStep} /> : <StartTourButton />}
+      {tourStep != null ? (
+        <GuidedTour step={tourStep} auto={tourAuto} />
+      ) : (
+        view !== "emp-overview" && <StartTourButton />
+      )}
     </div>
   );
 }

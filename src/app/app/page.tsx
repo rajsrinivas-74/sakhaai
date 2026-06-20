@@ -31,6 +31,7 @@ export default async function AppPage({
   const initialView: View | undefined =
     (sectionParam as View | undefined) ?? (viewParam === "career" ? "career" : undefined);
   const tourStep = Number.isInteger(tourParam) ? tourParam : undefined;
+  const tourAuto = sp.auto === "1";
 
-  return <SakhaApp actor={actor} initialView={initialView} tourStep={tourStep} />;
+  return <SakhaApp actor={actor} initialView={initialView} tourStep={tourStep} tourAuto={tourAuto} />;
 }
