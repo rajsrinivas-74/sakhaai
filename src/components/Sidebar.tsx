@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   BadgeCheck,
+  Bot,
   Briefcase,
   Compass,
   GraduationCap,
@@ -51,49 +52,68 @@ export type View =
 export type Role = "employee" | "manager" | "hr";
 
 type SubItem = { id: View; label: string; icon: typeof MessageCircle };
-type NavGroup = { feature: string; icon: typeof Compass; accent: Accent; items: SubItem[] };
+type NavGroup = {
+  /** Top entry. */
+  dashboard: SubItem;
+  /** Flagship feature — the key, clickable, grouping its related pages. */
+  feature: string;
+  featureId: View;
+  icon: typeof Compass;
+  accent: Accent;
+  items: SubItem[];
+  /** Conversational assistant — sits last. */
+  assistant: SubItem;
+};
 
 export const NAV_FOR: Record<Role, NavGroup> = {
   employee: {
+    dashboard: { id: "emp-overview", label: "Dashboard", icon: LayoutDashboard },
     feature: "Career GPS",
+    featureId: "career",
     icon: Compass,
     accent: "purple",
     items: [
-      { id: "emp-overview", label: "Overview", icon: LayoutDashboard },
-      { id: "chat", label: "Sakha Chat", icon: MessageCircle },
       { id: "career", label: "Roadmap", icon: Route },
       { id: "emp-performance", label: "My Performance", icon: Target },
       { id: "emp-growth", label: "Growth & Learning", icon: GraduationCap },
       { id: "emp-opportunities", label: "Opportunities", icon: Briefcase },
     ],
+    assistant: { id: "chat", label: "Ask Sakha", icon: MessageCircle },
   },
   manager: {
+    dashboard: { id: "mgr-overview", label: "Dashboard", icon: LayoutDashboard },
     feature: "Manager Copilot",
-    icon: LayoutDashboard,
+    featureId: "mgr-team",
+    icon: Bot,
     accent: "cyan",
     items: [
-      { id: "mgr-overview", label: "Overview", icon: LayoutDashboard },
       { id: "mgr-team", label: "Team & Readiness", icon: Users },
       { id: "mgr-performance", label: "Performance & KPP", icon: LineChart },
       { id: "mgr-retention", label: "Retention", icon: HeartPulse },
       { id: "mgr-scenarios", label: "Scenarios", icon: Sparkles },
-      { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
     ],
+    assistant: { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
   },
   hr: {
+    dashboard: { id: "hr-overview", label: "Dashboard", icon: LayoutDashboard },
     feature: "Workforce Intelligence",
+    featureId: "hr-demand",
     icon: Network,
     accent: "blue",
     items: [
-      { id: "hr-overview", label: "Overview", icon: LayoutDashboard },
       { id: "hr-demand", label: "Demand & Programs", icon: Layers },
       { id: "hr-capability", label: "Capability", icon: BadgeCheck },
       { id: "hr-buildbuy", label: "Build vs Buy", icon: LineChart },
       { id: "hr-talent", label: "Talent & Retention", icon: Users },
-      { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
     ],
+    assistant: { id: "ask", label: "Ask Sakha", icon: MessagesSquare },
   },
 };
+
+/** Flat list of every selectable destination, for current-label lookup. */
+function allItems(g: NavGroup): SubItem[] {
+  return [g.dashboard, ...g.items, g.assistant];
+}
 
 /** Default landing section per role. Employee keeps Chat as the golden-path entry. */
 export const DEFAULT_VIEW: Record<Role, View> = {
@@ -180,21 +200,28 @@ export function Sidebar({
         </Link>
       </div>
 
-      {/* FLAGSHIP FEATURE + nested sub-menu */}
-      <nav className="min-h-0 flex-1 overflow-y-auto">
-        <div
-          className="mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5"
-          style={{ background: accentRgba(group.accent, 0.1) }}
+      {/* Dashboard · flagship (the key, with related pages) · Ask Sakha */}
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto">
+        <SubButton item={group.dashboard} accent={group.accent} active={view === group.dashboard.id} onClick={() => onView(group.dashboard.id)} />
+
+        <button
+          onClick={() => onView(group.featureId)}
+          className="mt-1.5 mb-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left"
+          style={{ background: accentRgba(group.accent, group.items.some((i) => i.id === view) ? 0.16 : 0.1) }}
         >
           <FeatureIcon className="h-4 w-4" style={{ color: ACCENT_HEX[group.accent] }} />
           <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: ACCENT_HEX[group.accent] }}>
             {group.feature}
           </span>
-        </div>
-        <div className="space-y-0.5 border-l border-[var(--border)] pl-2">
+        </button>
+        <div className="ml-1 space-y-0.5 border-l border-[var(--border)] pl-2">
           {group.items.map((item) => (
             <SubButton key={item.id} item={item} accent={group.accent} active={view === item.id} onClick={() => onView(item.id)} />
           ))}
+        </div>
+
+        <div className="pt-1.5">
+          <SubButton item={group.assistant} accent={group.accent} active={view === group.assistant.id} onClick={() => onView(group.assistant.id)} />
         </div>
       </nav>
 
@@ -251,7 +278,7 @@ export function MobileBar({
 }) {
   const identity = getIdentity(role, twin);
   const group = NAV_FOR[role];
-  const current = group.items.find((i) => i.id === view);
+  const current = allItems(group).find((i) => i.id === view);
   const isEmployee = role === "employee";
 
   return (

@@ -33,5 +33,16 @@ export default async function AppPage({
   const tourStep = Number.isInteger(tourParam) ? tourParam : undefined;
   const tourAuto = sp.auto === "1";
 
-  return <SakhaApp actor={actor} initialView={initialView} tourStep={tourStep} tourAuto={tourAuto} />;
+  // Remount on a URL-driven destination change (tour / deep link / persona
+  // switch) so the section initialises correctly — client navigation updates
+  // props without remounting, which would otherwise leave `view` state stale.
+  return (
+    <SakhaApp
+      key={`${actor}:${initialView ?? "_"}`}
+      actor={actor}
+      initialView={initialView}
+      tourStep={tourStep}
+      tourAuto={tourAuto}
+    />
+  );
 }
