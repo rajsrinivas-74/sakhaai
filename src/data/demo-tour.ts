@@ -7,24 +7,27 @@ export const DEMO_TIMELINE = {
   /** Centered persona-switch card duration (seconds). */
   switchCardSecs: 3,
 
-  /** Seconds each step shows before auto-advancing (auto-play mode). */
+  /**
+   * Seconds each step shows before auto-advancing (auto-play mode).
+   * id → on-screen step (sub-page the tour lands on):
+   */
   stepSecs: {
-    // Priya — Employee · Career GPS
-    "priya-dashboard": 11,
-    "priya-performance": 25,
-    "priya-growth": 15,
-    "priya-ask": 21,
-    "priya-gps": 35,
-    "priya-autopilot": 21,
-    // Vikram — Manager · Manager Copilot
-    "vikram-dashboard": 13,
-    "vikram-team": 27,
-    "vikram-retention": 23,
-    "vikram-strategies": 21,
-    // Anita — Capability Manager · Workforce Intelligence
-    "anita-dashboard": 15,
-    "anita-buildbuy": 20,
-    "anita-retention": 20,
+    // ── Priya · Employee · Career GPS ──────────────────────────────
+    "priya-dashboard": 11, //  Dashboard (employee overview)
+    "priya-performance": 25, //  My Performance (KPP scorecard + manager feedback)
+    "priya-growth": 15, //  Growth & Learning (tracks + courses)
+    "priya-ask": 21, //  Ask Sakha (auto-asks the career question)
+    "priya-gps": 35, //  Career GPS · Roadmap (agents reason live)
+    "priya-autopilot": 21, //  Career GPS · Autopilot auto-engages (agents act)
+    // ── Vikram · Manager · Manager Copilot ─────────────────────────
+    "vikram-dashboard": 13, //  Dashboard (team health + readiness)
+    "vikram-team": 27, //  Team & Readiness (Priya spotlight + assign action)
+    "vikram-retention": 23, //  Retention (attrition what-if · Rajan)
+    "vikram-strategies": 21, //  Scenarios (what-if strategies)
+    // ── Anita · Capability Manager · Workforce Intelligence ────────
+    "anita-dashboard": 15, //  Dashboard (demand vs supply)
+    "anita-buildbuy": 20, //  Build vs Buy (₹13.9 Cr cohort case)
+    "anita-retention": 20, //  Talent & Retention (final · auto-finishes)
   },
 } as const;
 
