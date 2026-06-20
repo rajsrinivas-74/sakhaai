@@ -21,6 +21,7 @@ import { AgentDraftPanel, type AgentDraft } from "@/components/AgentDraftPanel";
 import { Briefing, type BriefingFinding } from "@/components/Briefing";
 import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
 import { ManagerWhatIf } from "@/components/ManagerWhatIf";
+import { ManagerKppRollup } from "@/components/ManagerKppRollup";
 import { AttritionSimulator } from "@/components/AttritionSimulator";
 
 const RISK_ACCENT: Record<"high" | "medium" | "low", Accent> = {
@@ -169,6 +170,9 @@ export function ManagerCopilot() {
             ))}
           </div>
         </div>
+
+        {/* YOUR KPP — revenue & margin rolled up from the team */}
+        <ManagerKppRollup />
 
         {/* WHAT-IF (signature) */}
         <ManagerWhatIf />

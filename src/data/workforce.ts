@@ -265,6 +265,87 @@ export const buildVsBuy: BuildVsBuyRole[] = [
 
 export const buildVsBuyTotalSavingCr = buildVsBuy.reduce((s, r) => s + r.savingCr, 0);
 
+/* ── Capability depth ───────────────────────────────────────────────────────
+ * Supply numbers hide maturity. Depth = headcount at each proficiency level, so
+ * a capability with few Experts reads as a depth risk even if total supply looks
+ * healthy. `minExperts` is the floor the active programs need. */
+export type CapabilityDepth = {
+  capability: string;
+  expert: number;
+  proficient: number;
+  competent: number;
+  learning: number;
+  minExperts: number;
+};
+
+export const capabilityDepth: CapabilityDepth[] = [
+  { capability: "AI / GenAI Engineering", expert: 4, proficient: 9, competent: 25, learning: 38, minExperts: 12 },
+  { capability: "Cloud & Platform", expert: 11, proficient: 22, competent: 28, learning: 14, minExperts: 10 },
+  { capability: "Cybersecurity", expert: 5, proficient: 12, competent: 27, learning: 9, minExperts: 9 },
+  { capability: "Quality & Automation", expert: 8, proficient: 18, competent: 21, learning: 7, minExperts: 6 },
+  { capability: "AI Governance", expert: 1, proficient: 3, competent: 6, learning: 11, minExperts: 5 },
+];
+
+/* ── Alliance & certification pipeline ──────────────────────────────────────
+ * Partner tiers require certified headcount for status, co-sell and margin
+ * benefits. Tracks certified vs the next-tier threshold and the velocity to
+ * close it. */
+export type Alliance = {
+  partner: string;
+  tier: string;
+  nextTier: string;
+  certified: number;
+  threshold: number;
+  velocityPerQtr: number;
+  benefit: string;
+  accent: "blue" | "purple" | "cyan" | "orange";
+};
+
+export const alliances: Alliance[] = [
+  { partner: "OpenAI", tier: "Build Partner", nextTier: "Solutions Partner", certified: 18, threshold: 30, velocityPerQtr: 6, benefit: "Co-sell + early model access", accent: "cyan" },
+  { partner: "Microsoft", tier: "Solutions Partner", nextTier: "AI Specialization", certified: 42, threshold: 60, velocityPerQtr: 9, benefit: "Azure AI specialization badge", accent: "blue" },
+  { partner: "AWS", tier: "Advanced Tier", nextTier: "Premier Tier", certified: 64, threshold: 100, velocityPerQtr: 11, benefit: "Premier margin & funding tier", accent: "orange" },
+];
+
+/* ── Emerging skills radar ──────────────────────────────────────────────────
+ * Skills by maturity stage with momentum (YoY demand change) and current supply
+ * — so capability can be pre-built before a skill hits the gap map. */
+export type SkillStage = "emerging" | "growing" | "mature" | "declining";
+
+export type EmergingSkill = {
+  skill: string;
+  stage: SkillStage;
+  momentum: number;
+  supply: number;
+};
+
+export const emergingSkills: EmergingSkill[] = [
+  { skill: "Agentic AI & orchestration", stage: "emerging", momentum: 220, supply: 6 },
+  { skill: "AI governance & EU AI Act", stage: "emerging", momentum: 180, supply: 4 },
+  { skill: "Prompt & context engineering", stage: "growing", momentum: 140, supply: 19 },
+  { skill: "LLM evaluation & guardrails", stage: "growing", momentum: 120, supply: 11 },
+  { skill: "GenAI app development", stage: "mature", momentum: 60, supply: 38 },
+  { skill: "Manual QA", stage: "declining", momentum: -35, supply: 58 },
+];
+
+/* ── Deal pipeline → capability demand ──────────────────────────────────────
+ * Open deals create skill demand on win. Probability-weighting the headcount
+ * turns the sales pipeline into a forward capability plan. */
+export type Deal = {
+  name: string;
+  valueCr: number;
+  probability: number;
+  skill: string;
+  headcount: number;
+  needBy: string;
+};
+
+export const dealPipeline: Deal[] = [
+  { name: "Truist — AI Transformation", valueCr: 48, probability: 70, skill: "GenAI + AI Delivery", headcount: 14, needBy: "Q3 FY26" },
+  { name: "FinCorp — GenAI Modernization", valueCr: 32, probability: 55, skill: "GenAI Engineering", headcount: 9, needBy: "Q3 FY26" },
+  { name: "RetailCo — Agentic Automation", valueCr: 21, probability: 40, skill: "Agentic AI + Automation", headcount: 7, needBy: "Q4 FY26" },
+];
+
 export const baseHrInsights: HrInsights = {
   hrPartner: "Anita Desai",
   hrPartnerTitle: "Chief People Officer",

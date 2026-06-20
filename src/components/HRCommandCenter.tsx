@@ -35,6 +35,10 @@ import { WorkforceSimulator } from "@/components/WorkforceSimulator";
 import { TransformationScorecard } from "@/components/TransformationScorecard";
 import { ProgramDemandTracker } from "@/components/ProgramDemandTracker";
 import { BuildVsBuyPortfolio } from "@/components/BuildVsBuyPortfolio";
+import { CapabilityDepthHeatmap } from "@/components/CapabilityDepthHeatmap";
+import { AlliancePipeline } from "@/components/AlliancePipeline";
+import { EmergingSkillsRadar } from "@/components/EmergingSkillsRadar";
+import { PipelineToDemand } from "@/components/PipelineToDemand";
 import { Briefing, type BriefingFinding } from "@/components/Briefing";
 import { ActionCenter, type ActionItem } from "@/components/ActionCenter";
 
@@ -202,6 +206,9 @@ export function HRCommandCenter({
         {/* STRATEGIC PROGRAM DEMAND TRACKER */}
         <ProgramDemandTracker onAct={setDraft} />
 
+        {/* PIPELINE → CAPABILITY DEMAND */}
+        <PipelineToDemand />
+
         {/* ROLE-LEVEL GAP MAP + AGENT ACTIVITY */}
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-xl attr-card bg-[var(--bg)] p-5">
@@ -225,11 +232,20 @@ export function HRCommandCenter({
           <AgentActivity events={liveEvents} title="Agent activity" compact />
         </div>
 
+        {/* CAPABILITY DEPTH — proficiency behind the supply numbers */}
+        <CapabilityDepthHeatmap />
+
         {/* AI DELIVERY MANAGER — build vs buy (Priya's cohort) */}
         <AiDeliveryManagerCase onAct={setDraft} />
 
         {/* BUILD VS BUY — full critical-role portfolio */}
         <BuildVsBuyPortfolio />
+
+        {/* ALLIANCE & CERTIFICATION PIPELINE */}
+        <AlliancePipeline />
+
+        {/* EMERGING SKILLS RADAR */}
+        <EmergingSkillsRadar />
 
         {/* WORKFORCE SIGNALS */}
         <div className="rounded-xl attr-card bg-[var(--bg)] p-5">

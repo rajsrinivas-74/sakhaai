@@ -64,6 +64,39 @@ export const READINESS_STATUS: Record<ReadinessStatus, { label: string; accent: 
   risk: { label: "Burnout risk", accent: "pink" },
 };
 
+/**
+ * Vikram's own KPP rollup. As an E5 Delivery Director his revenue/margin KPP IS
+ * the sum of his revenue-bearing reports (the E4 Delivery Managers). Engineers
+ * (E3) don't carry revenue/margin — they carry delivery/quality KPPs — but their
+ * utilisation still flows into account margin as cost. Figures in ₹ crore.
+ */
+export const managerKpp = {
+  revenue: { actual: 23.6, target: 22.0 },
+  margin: { actual: 10.1, target: 11.5 },
+  // Revenue-bearing reports — these roll up into the commercial KPP above.
+  commercialReports: [
+    { name: "Dev Rao", initial: "D", revenue: 9.1, revenueTarget: 8.8, margin: 4.0, marginTarget: 4.3 },
+    { name: "Kiran Bose", initial: "K", revenue: 8.7, revenueTarget: 8.0, margin: 3.7, marginTarget: 4.4 },
+    { name: "Priya Sharma", initial: "P", revenue: 5.8, revenueTarget: 5.2, margin: 2.4, marginTarget: 2.8 },
+  ],
+  // Why the margin KPP misses — decomposed to the account/person driving it.
+  marginBridge: [
+    { label: "Priya — rate stagnation", delta: -0.4 },
+    { label: "Rajan — over-utilisation cost", delta: -0.3 },
+    { label: "Other accounts", delta: -0.7 },
+  ],
+  // Delivery / quality KPPs from engineers (no revenue/margin of their own).
+  deliveryReports: [
+    { name: "Rajan Krishnan", initial: "R", role: "Senior QA · E3", defect: "1.4%", automation: "52%", util: "92%", flag: "over-utilised" },
+    { name: "Meera Kumar", initial: "M", role: "Engineer · E3", defect: "2.1%", automation: "61%", util: "78%", flag: "" },
+  ],
+  // The cross-link an ordinary dashboard wouldn't connect.
+  crossLink:
+    "Rajan's 92% utilisation — a delivery KPP — is inflating account cost: a ₹0.3 Cr drag on your margin KPP. Rebalancing him lifts margin and cuts his flight risk at once.",
+  forecast:
+    "If Priya completes Commercial Excellence and you rebalance Rajan, your margin KPP moves 88% → 95% next quarter.",
+};
+
 export const managerData = {
   manager: "Vikram Nair",
   managerTitle: "Senior Delivery Director",
