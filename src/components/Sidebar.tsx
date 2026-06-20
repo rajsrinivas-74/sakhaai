@@ -200,9 +200,10 @@ export function Sidebar({
         </Link>
       </div>
 
-      {/* Dashboard · flagship (the key, with related pages) · Ask Sakha */}
+      {/* Dashboard · Ask Sakha · flagship (the key, with related pages) */}
       <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto">
         <SubButton item={group.dashboard} accent={group.accent} active={view === group.dashboard.id} onClick={() => onView(group.dashboard.id)} />
+        <SubButton item={group.assistant} accent={group.accent} active={view === group.assistant.id} onClick={() => onView(group.assistant.id)} />
 
         <button
           onClick={() => onView(group.featureId)}
@@ -218,10 +219,6 @@ export function Sidebar({
           {group.items.map((item) => (
             <SubButton key={item.id} item={item} accent={group.accent} active={view === item.id} onClick={() => onView(item.id)} />
           ))}
-        </div>
-
-        <div className="pt-1.5">
-          <SubButton item={group.assistant} accent={group.accent} active={view === group.assistant.id} onClick={() => onView(group.assistant.id)} />
         </div>
       </nav>
 
