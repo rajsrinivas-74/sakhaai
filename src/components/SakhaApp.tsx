@@ -149,7 +149,15 @@ export function SakhaApp({
                   ) : view === "emp-overview" ? (
                     <EmployeeOverview twin={twin} onView={navView} />
                   ) : (
-                    <SakhaChat twin={twin} onNavigateCareer={navigateCareer} />
+                    <SakhaChat
+                      twin={twin}
+                      onNavigateCareer={navigateCareer}
+                      autoAsk={
+                        tourStep === 0 && twin.id === "priya"
+                          ? "How do I move into AI Delivery Management?"
+                          : undefined
+                      }
+                    />
                   )}
                 </div>
                 <div className="hidden min-h-0 xl:flex xl:flex-col xl:gap-4">

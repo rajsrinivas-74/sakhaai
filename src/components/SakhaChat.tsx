@@ -44,9 +44,12 @@ function greeting(twin: EmployeeTwin): ChatMessage {
 export function SakhaChat({
   twin,
   onNavigateCareer,
+  autoAsk,
 }: {
   twin: EmployeeTwin;
   onNavigateCareer: (goal: string) => void;
+  /** During the guided demo, auto-send this question so the chat shows the ask. */
+  autoAsk?: string;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([greeting(twin)]);
   const [input, setInput] = useState("");
@@ -67,6 +70,18 @@ export function SakhaChat({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
+
+  // Guided demo: auto-ask the job-movement question so the chat shows the
+  // actual interaction (Priya asking, Sakha responding) before the tour
+  // advances to Career GPS.
+  const autoAsked = useRef(false);
+  useEffect(() => {
+    if (!autoAsk || autoAsked.current) return;
+    autoAsked.current = true;
+    const t = setTimeout(() => void send(autoAsk), 1300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoAsk]);
 
   // Drop the GPS confirm prompt without navigating (employee chose "Not now").
   function dismissGps(id: string) {
