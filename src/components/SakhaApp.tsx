@@ -14,6 +14,7 @@ import {
   EmployeeGrowth,
   EmployeeOpportunities,
 } from "@/components/EmployeePages";
+import { GuidedTour, StartTourButton } from "@/components/GuidedTour";
 import { DigitalTwin } from "@/components/DigitalTwin";
 import { AgentDock } from "@/components/AgentDock";
 import { LiveRail } from "@/components/LiveRail";
@@ -27,9 +28,11 @@ export type Actor = PersonaId | "vikram" | "anita";
 export function SakhaApp({
   actor = "priya",
   initialView,
+  tourStep,
 }: {
   actor?: Actor;
   initialView?: View;
+  tourStep?: number;
 } = {}) {
   const role: Role = actor === "vikram" ? "manager" : actor === "anita" ? "hr" : "employee";
   const isManager = role === "manager";
@@ -37,9 +40,7 @@ export function SakhaApp({
   const persona: PersonaId | null = isEmployee ? (actor as PersonaId) : null;
   const twin = persona ? personaById(persona) : null;
 
-  const [view, setView] = useState<View>(
-    role === "employee" && initialView === "career" ? "career" : DEFAULT_VIEW[role],
-  );
+  const [view, setView] = useState<View>(initialView ?? DEFAULT_VIEW[role]);
   const [careerPrefill, setCareerPrefill] = useState<string | null>(
     !isManager && initialView === "career" && twin ? twin.careerGoal : null,
   );
@@ -49,9 +50,10 @@ export function SakhaApp({
   const [notif, setNotif] = useState<Notif | null>(null);
   const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sakha speaks first — but only to employees, in their own session.
+  // Sakha speaks first — but only to employees, in their own session. Held back
+  // during a guided tour so the walkthrough caption is the only narrator.
   useEffect(() => {
-    if (!persona) return;
+    if (!persona || tourStep != null) return;
     if (notifTimer.current) clearTimeout(notifTimer.current);
     const delay = persona === "priya" ? 900 : 1800;
     notifTimer.current = setTimeout(() => {
@@ -60,7 +62,7 @@ export function SakhaApp({
     return () => {
       if (notifTimer.current) clearTimeout(notifTimer.current);
     };
-  }, [persona]);
+  }, [persona, tourStep]);
 
   function navView(v: View) {
     setView(v);
@@ -193,6 +195,9 @@ export function SakhaApp({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Guided cross-persona walkthrough */}
+      {tourStep != null ? <GuidedTour step={tourStep} /> : <StartTourButton />}
     </div>
   );
 }

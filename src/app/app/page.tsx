@@ -12,6 +12,8 @@ export default async function AppPage({
   const sp = await searchParams;
   const personaParam = typeof sp.persona === "string" ? sp.persona : undefined;
   const viewParam = typeof sp.view === "string" ? sp.view : undefined;
+  const sectionParam = typeof sp.section === "string" ? sp.section : undefined;
+  const tourParam = typeof sp.tour === "string" ? Number(sp.tour) : NaN;
 
   // "vikram"/view=manager → manager lens, "anita"/view=hr → HR lens; otherwise
   // an employee. Unknown params default to Priya — the golden demo path.
@@ -25,7 +27,10 @@ export default async function AppPage({
         ? (personaParam as PersonaId)
         : "priya";
 
-  const initialView: View | undefined = viewParam === "career" ? "career" : undefined;
+  // A `section` deep-links to any sub-page; `view=career` is kept as a shorthand.
+  const initialView: View | undefined =
+    (sectionParam as View | undefined) ?? (viewParam === "career" ? "career" : undefined);
+  const tourStep = Number.isInteger(tourParam) ? tourParam : undefined;
 
-  return <SakhaApp actor={actor} initialView={initialView} />;
+  return <SakhaApp actor={actor} initialView={initialView} tourStep={tourStep} />;
 }
