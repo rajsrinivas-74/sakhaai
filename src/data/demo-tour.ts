@@ -13,21 +13,21 @@ export const DEMO_TIMELINE = {
    */
   stepSecs: {
     // ── Priya · Employee · Career GPS ──────────────────────────────
-    "priya-dashboard": 11, //  Dashboard (employee overview)
-    "priya-performance": 25, //  My Performance (KPP scorecard + manager feedback)
-    "priya-growth": 15, //  Growth & Learning (tracks + courses)
-    "priya-ask": 21, //  Ask Sakha (auto-asks the career question)
-    "priya-gps": 35, //  Career GPS · Roadmap (agents reason live)
-    "priya-autopilot": 21, //  Career GPS · Autopilot auto-engages (agents act)
+    "priya-dashboard": 10, //  Dashboard (employee overview)
+    "priya-performance": 15, //  My Performance (KPP scorecard + manager feedback)
+    "priya-growth": 10, //  Growth & Learning (tracks + courses)
+    "priya-ask": 15, //  Ask Sakha (auto-asks the career question)
+    "priya-gps": 25, //  Career GPS · Roadmap (agents reason live)
+    "priya-autopilot": 18, //  Career GPS · Autopilot auto-engages (agents act)
     // ── Vikram · Manager · Manager Copilot ─────────────────────────
-    "vikram-dashboard": 13, //  Dashboard (team health + readiness)
-    "vikram-team": 27, //  Team & Readiness (Priya spotlight + assign action)
-    "vikram-retention": 23, //  Retention (attrition what-if · Rajan)
-    "vikram-strategies": 21, //  Scenarios (what-if strategies)
+    "vikram-dashboard": 10, //  Dashboard (team health + readiness)
+    "vikram-team": 18, //  Team & Readiness (Priya spotlight + assign action)
+    "vikram-retention": 16, //  Retention (attrition what-if · Rajan)
+    "vikram-strategies": 10, //  Scenarios (what-if strategies)
     // ── Anita · Capability Manager · Workforce Intelligence ────────
-    "anita-dashboard": 15, //  Dashboard (demand vs supply)
-    "anita-buildbuy": 20, //  Build vs Buy (₹13.9 Cr cohort case)
-    "anita-retention": 20, //  Talent & Retention (final · auto-finishes)
+    "anita-dashboard": 12, //  Dashboard (demand vs supply)
+    "anita-buildbuy": 12, //  Build vs Buy (₹13.9 Cr cohort case)
+    "anita-retention": 12, //  Talent & Retention (final · auto-finishes)
   },
 } as const;
 
