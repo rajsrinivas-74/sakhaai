@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Compass, Flag, Pause, Play, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowRightLeft, Compass, Flag, Pause, Play, X } from "lucide-react";
 import type { View } from "@/components/Sidebar";
-import { ACCENT_HEX, accentRgba } from "@/lib/accents";
+import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 
 type TourActor = "priya" | "vikram" | "anita";
 export type TourStep = {
@@ -67,6 +67,12 @@ export const TOUR: TourStep[] = [
     dwell: 8000,
   },
 ];
+
+const ACTOR_INFO: Record<TourActor, { name: string; role: string; line: string; accent: Accent }> = {
+  priya: { name: "Priya Sharma", role: "Employee", line: "The journey starts with one employee asking a question.", accent: "purple" },
+  vikram: { name: "Vikram Nair", role: "Manager view", line: "Same moment, a different lens — watch how Priya's move reaches her manager.", accent: "cyan" },
+  anita: { name: "Anita Desai", role: "Capability Manager view", line: "Now zoom out — one employee's move becomes workforce strategy.", accent: "blue" },
+};
 
 function base(actor: TourActor): string {
   return actor === "vikram" ? "view=manager" : actor === "anita" ? "view=hr" : "persona=priya";
@@ -138,6 +144,17 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
   const router = useRouter();
   const s = TOUR[step];
   const last = step === TOUR.length - 1;
+  const prevActor = step > 0 ? TOUR[step - 1]?.actor : undefined;
+  const isSwitch = !!s && !!prevActor && prevActor !== s.actor;
+
+  // On a cross-persona step, announce the switch with a centered card for 5s.
+  // showSwitch seeds true on the step's remount; the effect just hides it.
+  const [showSwitch, setShowSwitch] = useState(isSwitch);
+  useEffect(() => {
+    if (!isSwitch) return;
+    const t = setTimeout(() => setShowSwitch(false), 5000);
+    return () => clearTimeout(t);
+  }, [isSwitch]);
 
   // Auto-advance: navigate to the next step after the step's dwell time.
   useEffect(() => {
@@ -148,13 +165,49 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
 
   if (!s) return null;
   const exit = () => router.push(`/app?${base(s.actor)}`);
+  const info = ACTOR_INFO[s.actor];
 
   return (
-    <motion.div
-      key={step}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-4 left-1/2 z-40 w-[min(94vw,660px)] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-xl"
+    <>
+      {/* Centered persona-switch announcement (5s) */}
+      <AnimatePresence>
+        {showSwitch && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          >
+            <div className="absolute inset-0 bg-black/70" />
+            <motion.div
+              initial={{ scale: 0.92, y: 12, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="relative w-[min(90vw,420px)] rounded-2xl border p-7 text-center shadow-2xl"
+              style={{ borderColor: accentRgba(info.accent, 0.5), background: "var(--card)" }}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: ACCENT_HEX[info.accent] }}>
+                Switching view
+              </p>
+              <div
+                className="mx-auto mt-3 flex h-14 w-14 items-center justify-center rounded-2xl"
+                style={{ background: accentRgba(info.accent, 0.16), color: ACCENT_HEX[info.accent] }}
+              >
+                <ArrowRightLeft className="h-6 w-6" />
+              </div>
+              <h2 className="mt-3 text-xl font-bold text-[var(--text-primary)]">{info.name}</h2>
+              <p className="text-sm font-medium" style={{ color: ACCENT_HEX[info.accent] }}>{info.role}</p>
+              <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{info.line}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        key={step}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed bottom-4 left-1/2 z-40 w-[min(94vw,660px)] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-xl"
       style={{ borderColor: accentRgba("purple", 0.5), background: "var(--card)" }}
     >
       {/* AUTO-ADVANCE COUNTDOWN BAR */}
@@ -255,6 +308,7 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
           </div>
         </div>
       </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
