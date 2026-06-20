@@ -168,12 +168,12 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
   const prevActor = step > 0 ? TOUR[step - 1]?.actor : undefined;
   const isSwitch = !!s && !!prevActor && prevActor !== s.actor;
 
-  // On a cross-persona step, announce the switch with a centered card for 5s.
+  // On a cross-persona step, announce the switch with a centered card for 3s.
   // showSwitch seeds true on the step's remount; the effect just hides it.
   const [showSwitch, setShowSwitch] = useState(isSwitch);
   useEffect(() => {
     if (!isSwitch) return;
-    const t = setTimeout(() => setShowSwitch(false), 5000);
+    const t = setTimeout(() => setShowSwitch(false), 3000);
     return () => clearTimeout(t);
   }, [isSwitch]);
 
