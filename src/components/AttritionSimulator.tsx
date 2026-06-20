@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Loader2, ShieldAlert, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  Gauge,
+  GraduationCap,
+  Loader2,
+  ShieldAlert,
+  Sparkles,
+  TrendingDown,
+} from "lucide-react";
 import { ACCENT_HEX, accentRgba } from "@/lib/accents";
 import { AgentChip } from "@/components/AgentChip";
 
@@ -10,6 +19,15 @@ const BASE_RISK = 73;
 const FLOOR = 9;
 
 type Lever = { id: string; label: string; delta: number; why: string };
+
+/** The observed signals Sakha fuses into the flight-risk score — each with the
+ * enterprise source it would come from in a real deployment. */
+const SIGNALS = [
+  { icon: Clock, value: "8 late nights this week", source: "After-hours VPN / SSO logins" },
+  { icon: TrendingDown, value: "Engagement −27% over 60 days", source: "Pulse survey trend + participation" },
+  { icon: GraduationCap, value: "Learning stopped 45 days ago", source: "LMS / Degreed activity" },
+  { icon: Gauge, value: "Utilisation 92% vs 85% target", source: "Staffing / timesheets" },
+];
 
 const LEVERS: Lever[] = [
   { id: "path", label: "Approve Automation Architect path", delta: 52, why: "growth resumes, so market-pull drops sharply" },
@@ -86,6 +104,27 @@ export function AttritionSimulator() {
           Attrition what-if · Rajan Krishnan
         </div>
         <AgentChip agent="wellbeing" status={applied ? "acting" : "watching"} />
+      </div>
+
+      {/* SIGNALS OBSERVED — provenance of the risk score */}
+      <div className="mt-3 rounded-lg attr-card bg-[var(--bg)] p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+          Signals observed · how Sakha knows
+        </p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {SIGNALS.map((sig) => (
+            <div key={sig.value} className="flex items-start gap-2">
+              <sig.icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--ai-pink)]" />
+              <div className="min-w-0">
+                <p className="text-xs leading-4 text-[var(--text-primary)]">{sig.value}</p>
+                <p className="text-[10px] text-[var(--text-muted)]">{sig.source}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] text-[var(--text-muted)]">
+          Metadata only — never message content. Aggregated to the manager, not the detail.
+        </p>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-[150px_1fr] sm:items-center">
