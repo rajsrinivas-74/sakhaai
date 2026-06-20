@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowRightLeft, Compass, Flag, Pause, Play, X } from "lucide-react";
 import type { View } from "@/components/Sidebar";
+import { DEMO_TIMELINE, stepMs, type DemoStepId } from "@/data/demo-tour";
 import { ACCENT_HEX, accentRgba, type Accent } from "@/lib/accents";
 
 type TourActor = "priya" | "vikram" | "anita";
 export type TourStep = {
+  /** Stable id — its duration is configured in DEMO_TIMELINE. */
+  id: DemoStepId;
   actor: TourActor;
   view: View;
   lens: string;
@@ -16,8 +19,6 @@ export type TourStep = {
   caption: string;
   /** Subtle "what's happening" line shown under the caption. */
   detail: string;
-  /** Dwell time (ms) before auto-advancing to the next step. */
-  dwell: number;
   /** When true, the Career GPS result auto-engages Autopilot on this step. */
   engage?: boolean;
 };
@@ -33,84 +34,71 @@ export function tourStepEngages(step: number | undefined): boolean {
 export const TOUR: TourStep[] = [
   // ── PRIYA ─────────────────────────────────────────────
   {
-    actor: "priya", view: "emp-overview", lens: "Employee · Priya", title: "Priya’s dashboard",
+    id: "priya-dashboard", actor: "priya", view: "emp-overview", lens: "Employee · Priya", title: "Priya’s dashboard",
     caption: "Start where Priya starts — her workspace and the signals Sakha reasons over.",
     detail: "AGENTS: the fleet has already assembled her Digital Twin before she asks a thing.",
-    dwell: 16000,
   },
   {
-    actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Performance evidence",
+    id: "priya-performance", actor: "priya", view: "emp-performance", lens: "Employee · Priya", title: "Performance evidence",
     caption: "Her real KPP appraisal and Vikram’s feedback — the evidence behind every recommendation.",
     detail: "AGENT EVIDENCE: revenue strength, the margin miss, DEI — the Career Agent reads all of it.",
-    dwell: 30000,
   },
   {
-    actor: "priya", view: "emp-growth", lens: "Employee · Priya", title: "Growth & learning",
+    id: "priya-growth", actor: "priya", view: "emp-growth", lens: "Employee · Priya", title: "Growth & learning",
     caption: "What she’s learning now and the tracks the agents recommend toward her goal.",
     detail: "AGENTS: the Learning Agent sequences courses and reserves calendar time.",
-    dwell: 20000,
   },
   {
-    actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks",
+    id: "priya-ask", actor: "priya", view: "chat", lens: "Employee · Priya", title: "Priya asks",
     caption: "She asks a specific question — which career to target to move into AI Delivery Management.",
     detail: "AGENTS: Sakha is a fleet, not a chatbot — it answers from her Twin and KPPs, not a script.",
-    dwell: 26000,
   },
   {
-    actor: "priya", view: "career", lens: "Employee · Priya", title: "Agents reason — live",
+    id: "priya-gps", actor: "priya", view: "career", lens: "Employee · Priya", title: "Agents reason — live",
     caption: "Six agents wake up: the Career Agent reads her Twin, then hands off to Learning, Opportunity and Workforce.",
     detail: "AGENTS AT WORK: every reasoning line is a different agent — Career → gaps, Learning → courses, Opportunity → roles, Workforce → org demand.",
-    dwell: 40000,
   },
   {
-    actor: "priya", view: "career", lens: "Employee · Priya", title: "Enable Career Autopilot", engage: true,
+    id: "priya-autopilot", actor: "priya", view: "career", lens: "Employee · Priya", title: "Enable Career Autopilot", engage: true,
     caption: "She engages Autopilot — agents enroll her, block her calendar, and flag her up the chain.",
     detail: "AGENTS ACT: one commitment ripples to her manager and to HR — watch the next two lenses.",
-    dwell: 26000,
   },
   // ── VIKRAM ────────────────────────────────────────────
   {
-    actor: "vikram", view: "mgr-overview", lens: "Manager · Vikram", title: "Manager’s dashboard",
+    id: "vikram-dashboard", actor: "vikram", view: "mgr-overview", lens: "Manager · Vikram", title: "Manager’s dashboard",
     caption: "Same moment, a different lens. Vikram opens to team health and readiness first.",
     detail: "AGENTS: the Manager Agent surfaced Priya’s move to his board — he didn’t go looking.",
-    dwell: 18000,
   },
   {
-    actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Assign Priya",
+    id: "vikram-team", actor: "vikram", view: "mgr-team", lens: "Manager · Vikram", title: "Assign Priya",
     caption: "Priya in his spotlight — the same readiness she sees, plus the drafted action to assign her to the AI Studio Pilot.",
     detail: "AGENTS: the Manager Agent ranks readiness and pre-drafts the assignment for one-click approval.",
-    dwell: 32000,
   },
   {
-    actor: "vikram", view: "mgr-retention", lens: "Manager · Vikram", title: "Retention, caught early",
+    id: "vikram-retention", actor: "vikram", view: "mgr-retention", lens: "Manager · Vikram", title: "Retention, caught early",
     caption: "The Wellbeing Agent caught Rajan — 8 late nights, engagement down 27% — a flight risk before he resigns.",
     detail: "AGENTS: the attrition what-if re-forecasts risk live as Vikram pulls retention levers.",
-    dwell: 28000,
   },
   {
-    actor: "vikram", view: "mgr-scenarios", lens: "Manager · Vikram", title: "Strategies — what-if",
+    id: "vikram-strategies", actor: "vikram", view: "mgr-scenarios", lens: "Manager · Vikram", title: "Strategies — what-if",
     caption: "Strategies: model the moves — attrition impact, upskilling cohorts — before committing.",
     detail: "AGENTS: the Manager Agent forecasts delivery and morale impact for each scenario.",
-    dwell: 26000,
   },
   // ── ANITA ─────────────────────────────────────────────
   {
-    actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "Workforce dashboard",
+    id: "anita-dashboard", actor: "anita", view: "hr-overview", lens: "Capability · Anita", title: "Workforce dashboard",
     caption: "Now zoom all the way out. Anita opens to demand vs supply across the workforce.",
     detail: "AGENTS: the Workforce Agent keeps org demand and supply live as commitments land.",
-    dwell: 18000,
   },
   {
-    actor: "anita", view: "hr-buildbuy", lens: "Capability · Anita", title: "One move fans out",
+    id: "anita-buildbuy", actor: "anita", view: "hr-buildbuy", lens: "Capability · Anita", title: "One move fans out",
     caption: "Priya’s move surfaced 23 look-alikes — reskill them and supply goes 3 → 19, ₹13.9 Cr saved vs hiring.",
     detail: "AGENTS SCALE IT: the Workforce Agent sizes the cohort, the Opportunity Agent matches the talent.",
-    dwell: 40000,
   },
   {
-    actor: "anita", view: "hr-talent", lens: "Capability · Anita", title: "Retention, not just supply",
+    id: "anita-retention", actor: "anita", view: "hr-talent", lens: "Capability · Anita", title: "Retention, not just supply",
     caption: "The fleet closes the thread: people inside HCLTech see a path, stay, and move to where demand is.",
     detail: "THE FLEET: Career, Learning, Opportunity, Workforce, Manager, Wellbeing — one event, three lenses.",
-    dwell: 8000,
   },
 ];
 
@@ -198,14 +186,18 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
   const [showSwitch, setShowSwitch] = useState(isSwitch);
   useEffect(() => {
     if (!isSwitch) return;
-    const t = setTimeout(() => setShowSwitch(false), 3000);
+    const t = setTimeout(() => setShowSwitch(false), DEMO_TIMELINE.switchCardSecs * 1000);
     return () => clearTimeout(t);
   }, [isSwitch]);
 
-  // Auto-advance: navigate to the next step after the step's dwell time.
+  // Auto-advance after the step's configured duration; the last step
+  // auto-finishes (exits the tour) instead of advancing.
   useEffect(() => {
-    if (!auto || !s || last) return;
-    const t = setTimeout(() => router.push(tourStepUrl(step + 1, true)), s.dwell);
+    if (!auto || !s) return;
+    const t = setTimeout(() => {
+      if (last) router.push(`/app?${base(s.actor)}`);
+      else router.push(tourStepUrl(step + 1, true));
+    }, stepMs(s.id));
     return () => clearTimeout(t);
   }, [auto, step, last, s, router]);
 
@@ -257,14 +249,14 @@ export function GuidedTour({ step, auto = false }: { step: number; auto?: boolea
       style={{ borderColor: accentRgba("purple", 0.5), background: "var(--card)" }}
     >
       {/* AUTO-ADVANCE COUNTDOWN BAR */}
-      {auto && !last && (
+      {auto && (
         <motion.div
           key={`bar-${step}`}
           className="h-1"
           style={{ background: ACCENT_HEX.purple }}
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
-          transition={{ duration: s.dwell / 1000, ease: "linear" }}
+          transition={{ duration: stepMs(s.id) / 1000, ease: "linear" }}
         />
       )}
 
